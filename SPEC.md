@@ -582,6 +582,10 @@ Os modais devem:
 - Manter foco dentro do modal;
 - Restaurar o foco ao elemento anterior;
 - Ser utilizáveis em telas pequenas;
+- Limitar sua altura à viewport dinâmica do dispositivo;
+- Manter cabeçalho e ação de fechar visíveis enquanto o conteúdo possui rolagem interna;
+- Permitir alcançar todas as ações em telas de pelo menos 360 × 640 px;
+- Respeitar a área segura inferior em dispositivos móveis;
 - Exibir mensagens de validação próximas aos campos.
 
 ---

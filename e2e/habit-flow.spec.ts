@@ -66,3 +66,32 @@ test("abre a metodologia e retorna ao painel", async ({ page }) => {
     page.getByRole("heading", { name: /seu primeiro hábito começa/i })
   ).toBeVisible();
 });
+
+test("conclui o cadastro em um celular compacto", async ({ page }) => {
+  await page.setViewportSize({ width: 360, height: 640 });
+  await page.goto("/");
+  await page.getByRole("button", { name: /criar primeiro hábito/i }).click();
+
+  await page.getByLabel(/qual hábito você quer construir/i).fill("Alongar");
+  await page.getByLabel(/detalhe do hábito/i).fill("por 5 minutos ao acordar");
+  await page.getByRole("button", { name: "Domingo" }).click();
+
+  const configure = page.getByRole("button", { name: /configurar estimador/i });
+  await configure.scrollIntoViewIfNeeded();
+  await expect(configure).toBeInViewport();
+  await configure.click();
+
+  const useEstimate = page.getByRole("button", {
+    name: /usar esta estimativa/i
+  });
+  await useEstimate.scrollIntoViewIfNeeded();
+  await expect(useEstimate).toBeInViewport();
+  await useEstimate.click();
+
+  const save = page.getByRole("button", { name: /salvar hábito/i });
+  await save.scrollIntoViewIfNeeded();
+  await expect(save).toBeInViewport();
+  await save.click();
+
+  await expect(page.getByRole("heading", { name: "Alongar" })).toBeVisible();
+});
