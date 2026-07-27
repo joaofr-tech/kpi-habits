@@ -126,6 +126,8 @@ Cada opção deve mostrar:
 - Explicação curta;
 - Exemplo quando necessário.
 
+Ao final da configuração, o botão principal deve possuir o texto `Salvar hábito` e concluir o cadastro imediatamente com a estimativa apresentada. O usuário não deve precisar retornar à primeira etapa para salvar.
+
 ---
 
 ## RF04 — Calcular o Dia-Alvo
@@ -148,6 +150,7 @@ Também deve ser exibido um aviso curto:
 
 Ao salvar um hábito:
 
+- O identificador deve ser gerado mesmo quando a aplicação for aberta por HTTP em um dispositivo da rede local;
 - A data atual deve ser registrada como data de início;
 - O Dia-Alvo deve ser persistido;
 - Os valores selecionados no estimador devem ser persistidos;

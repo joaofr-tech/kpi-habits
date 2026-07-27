@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { FACTORS, WEEKDAYS } from "../data/factors";
 import { calculateTargetDays, toLocalDateKey } from "../domain/habits";
+import { createId } from "../domain/id";
 import type { Habit, HabitFactors, HabitFactorLevel, Weekday } from "../types";
 import { CloseIcon } from "./Icons";
 
@@ -30,7 +31,6 @@ export function CreateHabitDialog({
   const [minimumVersion, setMinimumVersion] = useState("");
   const [weekdays, setWeekdays] = useState<Weekday[]>([]);
   const [factors, setFactors] = useState<HabitFactors>(DEFAULT_FACTORS);
-  const [configured, setConfigured] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
   useEffect(() => {
@@ -46,7 +46,6 @@ export function CreateHabitDialog({
     setMinimumVersion("");
     setWeekdays([]);
     setFactors(DEFAULT_FACTORS);
-    setConfigured(false);
     setSubmitted(false);
   }
 
@@ -74,9 +73,9 @@ export function CreateHabitDialog({
 
   function save() {
     setSubmitted(true);
-    if (!nameValid || !detailsValid || !scheduleValid || !configured) return;
+    if (!nameValid || !detailsValid || !scheduleValid) return;
     onSave({
-      id: crypto.randomUUID(),
+      id: createId(),
       name: name.trim(),
       details: details.trim(),
       createdAt: toLocalDateKey(),
@@ -198,14 +197,6 @@ export function CreateHabitDialog({
             )}
           </fieldset>
 
-          {configured && (
-            <div className="estimate-preview">
-              <span>Seu período de acompanhamento</span>
-              <strong>Dia-Alvo: {targetDays} dias</strong>
-              <small>Uma estimativa para acompanhamento, não uma previsão exata.</small>
-            </div>
-          )}
-
           <div className="dialog-actions">
             <button className="button-secondary" onClick={close}>Cancelar</button>
             <button
@@ -218,11 +209,8 @@ export function CreateHabitDialog({
                 }
               }}
             >
-              {configured ? "Revisar estimador" : "Configurar estimador"}
+              Configurar estimador
             </button>
-            {configured && (
-              <button className="button-primary" onClick={save}>Salvar hábito</button>
-            )}
           </div>
         </div>
       ) : (
@@ -263,12 +251,9 @@ export function CreateHabitDialog({
             </button>
             <button
               className="button-primary"
-              onClick={() => {
-                setConfigured(true);
-                setStep(1);
-              }}
+              onClick={save}
             >
-              Usar esta estimativa
+              Salvar hábito
             </button>
           </div>
         </div>

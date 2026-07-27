@@ -30,7 +30,6 @@ describe("painel", () => {
     await user.click(screen.getByRole("button", { name: "Segunda-feira" }));
     await user.click(screen.getByRole("button", { name: "Terça-feira" }));
     await user.click(screen.getByRole("button", { name: /configurar estimador/i }));
-    await user.click(screen.getByRole("button", { name: /usar esta estimativa/i }));
     await user.click(screen.getByRole("button", { name: /salvar hábito/i }));
 
     expect(screen.getByRole("heading", { name: "Caminhar" })).toBeInTheDocument();

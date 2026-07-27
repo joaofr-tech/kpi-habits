@@ -30,7 +30,6 @@ test("cria, persiste, registra e exclui um hábito", async ({
   };
   await page.getByRole("button", { name: labels[weekday] }).click();
   await page.getByRole("button", { name: /configurar estimador/i }).click();
-  await page.getByRole("button", { name: /usar esta estimativa/i }).click();
   await page.getByRole("button", { name: /salvar hábito/i }).click();
 
   await expect(page.getByRole("heading", { name: "Caminhar" })).toBeVisible();
@@ -68,6 +67,12 @@ test("abre a metodologia e retorna ao painel", async ({ page }) => {
 });
 
 test("conclui o cadastro em um celular compacto", async ({ page }) => {
+  await page.addInitScript(() => {
+    Object.defineProperty(Crypto.prototype, "randomUUID", {
+      value: undefined,
+      configurable: true
+    });
+  });
   await page.setViewportSize({ width: 360, height: 640 });
   await page.goto("/");
   await page.getByRole("button", { name: /criar primeiro hábito/i }).click();
@@ -80,13 +85,6 @@ test("conclui o cadastro em um celular compacto", async ({ page }) => {
   await configure.scrollIntoViewIfNeeded();
   await expect(configure).toBeInViewport();
   await configure.click();
-
-  const useEstimate = page.getByRole("button", {
-    name: /usar esta estimativa/i
-  });
-  await useEstimate.scrollIntoViewIfNeeded();
-  await expect(useEstimate).toBeInViewport();
-  await useEstimate.click();
 
   const save = page.getByRole("button", { name: /salvar hábito/i });
   await save.scrollIntoViewIfNeeded();
