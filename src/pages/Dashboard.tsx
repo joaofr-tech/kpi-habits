@@ -23,17 +23,6 @@ export function Dashboard() {
     <div className="page-shell">
       <AppHeader onAdd={() => setCreating(true)} />
       <main className="dashboard">
-        <div className="hero">
-          <div>
-            <span className="eyebrow">Seu sistema, não sua força de vontade</span>
-            <h1>Hábitos que<br />ficam.</h1>
-          </div>
-          <p>
-            Acompanhe o processo, proteja a repetição e descubra quando o
-            comportamento começa a se tornar automático.
-          </p>
-        </div>
-
         {habits.length === 0 ? (
           <section className="empty-state">
             <div className="empty-mark" aria-hidden="true">01</div>

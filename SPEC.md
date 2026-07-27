@@ -473,6 +473,10 @@ O botão deve:
 
 O conteúdo principal deve apresentar os cards dos hábitos.
 
+Os cards ou o estado vazio devem começar imediatamente após o cabeçalho. Não deve existir um bloco promocional, slogan ou mensagem introdutória entre o cabeçalho e os hábitos.
+
+Em telas desktop comuns, o cabeçalho, o estado vazio ou até dois cards e o rodapé devem caber na altura disponível sem exigir rolagem. Em telas pequenas ou quando houver mais conteúdo, a rolagem deve permanecer disponível para evitar cortes.
+
 Os cards devem permitir identificar rapidamente:
 
 - Qual é o hábito;

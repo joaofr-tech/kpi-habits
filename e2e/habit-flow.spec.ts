@@ -2,6 +2,11 @@ import { expect, test } from "@playwright/test";
 
 test("cria, persiste, registra e exclui um hábito", async ({ page }) => {
   await page.goto("/");
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollHeight > window.innerHeight
+    )
+  ).toBe(false);
   await page.getByRole("button", { name: /criar primeiro hábito/i }).click();
   await page.getByLabel(/qual hábito você quer construir/i).fill("Caminhar");
   await page
@@ -41,5 +46,7 @@ test("abre a metodologia e retorna ao painel", async ({ page }) => {
   await page.getByRole("link", { name: /abrir metodologia/i }).click();
   await expect(page.getByRole("heading", { name: /repetir é construir/i })).toBeVisible();
   await page.getByRole("link", { name: /voltar ao painel/i }).click();
-  await expect(page.getByRole("heading", { name: /hábitos que ficam/i })).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: /seu primeiro hábito começa/i })
+  ).toBeVisible();
 });
