@@ -38,11 +38,6 @@ export function HabitCard({
     <article className="habit-card">
       <div className="card-head">
         <div>
-          <span className="card-kicker">
-            {habit.automaticityStatus === "CONSOLIDATED"
-              ? "Hábito consolidado"
-              : `Dia ${days}`}
-          </span>
           <h2>{habit.name}</h2>
           {habit.details && <p className="habit-details">{habit.details}</p>}
         </div>
@@ -57,7 +52,7 @@ export function HabitCard({
 
       {habit.minimumVersion && (
         <p className="minimum-version">
-          <span>Versão mínima</span>
+          <span>Mínimo:</span>
           {habit.minimumVersion}
         </p>
       )}
@@ -65,6 +60,10 @@ export function HabitCard({
       <div className="progress-label">
         <span>{days} de {habit.targetDays} dias</span>
         <strong>{progress}%</strong>
+      </div>
+      <div className="mobile-card-summary">
+        <strong>Dia {days} de {habit.targetDays}</strong>
+        <span>{rate === null ? "—" : `${rate}% consistência`}</span>
       </div>
       <div
         className="progress-track"

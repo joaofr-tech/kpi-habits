@@ -1,6 +1,9 @@
 import { expect, test } from "@playwright/test";
 
-test("cria, persiste, registra e exclui um hábito", async ({ page }) => {
+test("cria, persiste, registra e exclui um hábito", async ({
+  page,
+  isMobile
+}) => {
   await page.goto("/");
   expect(
     await page.evaluate(
@@ -32,9 +35,22 @@ test("cria, persiste, registra e exclui um hábito", async ({ page }) => {
 
   await expect(page.getByRole("heading", { name: "Caminhar" })).toBeVisible();
   await expect(page.getByText("por 20 minutos depois do almoço")).toBeVisible();
+
+  if (isMobile) {
+    await expect(page.locator(".mobile-card-summary")).toBeVisible();
+    await expect(page.locator(".metric-row")).toBeHidden();
+  } else {
+    await expect(page.locator(".mobile-card-summary")).toBeHidden();
+    await expect(page.locator(".metric-row")).toBeVisible();
+  }
+
   await page.reload();
   await page.getByRole("button", { name: /^concluído/i }).click();
-  await expect(page.getByText("100%")).toBeVisible();
+  await expect(
+    isMobile
+      ? page.getByText("100% consistência")
+      : page.getByText("100%", { exact: true })
+  ).toBeVisible();
 
   page.on("dialog", (dialog) => dialog.accept());
   await page.getByRole("button", { name: /excluir caminhar/i }).click();

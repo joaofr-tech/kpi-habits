@@ -498,6 +498,26 @@ Default sugerido de hierarquia:
 
 ## 8.4 Card de hábito
 
+### Densidade responsiva
+
+Em desktop amplo, os cards devem utilizar a variação **Atual condensada**:
+
+- Grade de três colunas, com duas colunas em larguras intermediárias;
+- Padding interno de 20 px;
+- Linha compacta com percentual de progresso;
+- Linha de métricas com Consistência, Dia-Alvo e Hoje;
+- Controles de registro com altura mínima de 44 px.
+
+Em dispositivos móveis, os cards devem utilizar a variação **Compacta estrutural 01**:
+
+- Uma única coluna;
+- Remover a linha de três métricas;
+- Exibir `Dia X de Y` e `Z% consistência` na mesma linha;
+- O estado atual deve ser comunicado pelos controles selecionados;
+- Manter a barra de progresso e os controles com altura mínima de 44 px.
+
+Quando existir, a versão mínima deve aparecer em uma linha curta no formato `Mínimo: descrição`.
+
 Cada card deve conter:
 
 - Nome do hábito;
