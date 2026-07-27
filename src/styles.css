@@ -147,6 +147,7 @@ a { color: inherit; }
   color: var(--muted); text-transform: uppercase; letter-spacing: .12em; font-size: 10px; font-weight: 800;
 }
 .card-head h2 { margin: 0; font: 700 27px/1.15 "Manrope"; letter-spacing: -.04em; }
+.habit-details { margin: 6px 0 0; color: var(--muted); font-size: 14px; line-height: 1.45; }
 .minimum-version { margin: 20px 0 0; color: #504e49; font-size: 14px; line-height: 1.45; }
 .minimum-version span { display: block; color: #929089; font-size: 10px; text-transform: uppercase; letter-spacing: .1em; font-weight: 700; }
 .progress-label { display: flex; justify-content: space-between; margin-top: 28px; font-size: 13px; color: var(--muted); }

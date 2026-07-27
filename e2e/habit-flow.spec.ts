@@ -4,6 +4,9 @@ test("cria, persiste, registra e exclui um hábito", async ({ page }) => {
   await page.goto("/");
   await page.getByRole("button", { name: /criar primeiro hábito/i }).click();
   await page.getByLabel(/qual hábito você quer construir/i).fill("Caminhar");
+  await page
+    .getByLabel(/detalhe do hábito/i)
+    .fill("por 20 minutos depois do almoço");
 
   const weekday = new Intl.DateTimeFormat("en-US", { weekday: "long" })
     .format(new Date())
@@ -17,13 +20,13 @@ test("cria, persiste, registra e exclui um hábito", async ({ page }) => {
     FRIDAY: "Sexta-feira",
     SATURDAY: "Sábado"
   };
-  await page.getByRole("slider", { name: /frequência semanal/i }).fill("1");
   await page.getByRole("button", { name: labels[weekday] }).click();
   await page.getByRole("button", { name: /configurar estimador/i }).click();
   await page.getByRole("button", { name: /usar esta estimativa/i }).click();
   await page.getByRole("button", { name: /salvar hábito/i }).click();
 
   await expect(page.getByRole("heading", { name: "Caminhar" })).toBeVisible();
+  await expect(page.getByText("por 20 minutos depois do almoço")).toBeVisible();
   await page.reload();
   await page.getByRole("button", { name: /^concluído/i }).click();
   await expect(page.getByText("100%")).toBeVisible();

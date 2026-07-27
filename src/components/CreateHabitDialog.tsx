@@ -26,8 +26,8 @@ export function CreateHabitDialog({
   const dialogRef = useRef<HTMLDialogElement>(null);
   const [step, setStep] = useState<1 | 2>(1);
   const [name, setName] = useState("");
+  const [details, setDetails] = useState("");
   const [minimumVersion, setMinimumVersion] = useState("");
-  const [frequency, setFrequency] = useState(3);
   const [weekdays, setWeekdays] = useState<Weekday[]>([]);
   const [factors, setFactors] = useState<HabitFactors>(DEFAULT_FACTORS);
   const [configured, setConfigured] = useState(false);
@@ -42,8 +42,8 @@ export function CreateHabitDialog({
   function reset() {
     setStep(1);
     setName("");
+    setDetails("");
     setMinimumVersion("");
-    setFrequency(3);
     setWeekdays([]);
     setFactors(DEFAULT_FACTORS);
     setConfigured(false);
@@ -59,31 +59,30 @@ export function CreateHabitDialog({
   function toggleWeekday(day: Weekday) {
     setWeekdays((current) => {
       if (current.includes(day)) return current.filter((item) => item !== day);
-      if (current.length >= frequency) return current;
       return [...current, day];
     });
   }
 
-  function changeFrequency(value: number) {
-    setFrequency(value);
-    setWeekdays((current) => current.slice(0, value));
-    setConfigured(false);
-  }
-
-  const scheduleValid = weekdays.length === frequency;
+  const scheduleValid = weekdays.length > 0;
   const nameValid = name.trim().length > 0 && name.trim().length <= 80;
-  const targetDays = calculateTargetDays(factors, frequency);
+  const detailsValid =
+    details.trim().length > 0 && details.trim().length <= 160;
+  const targetDays = calculateTargetDays(
+    factors,
+    Math.max(1, weekdays.length)
+  );
 
   function save() {
     setSubmitted(true);
-    if (!nameValid || !scheduleValid || !configured) return;
+    if (!nameValid || !detailsValid || !scheduleValid || !configured) return;
     onSave({
       id: crypto.randomUUID(),
       name: name.trim(),
+      details: details.trim(),
       createdAt: toLocalDateKey(),
       targetDays,
       factors,
-      schedule: { frequencyPerWeek: frequency, weekdays },
+      schedule: { weekdays },
       minimumVersion: minimumVersion.trim() || undefined,
       logs: [],
       automaticityStatus: "TRACKING"
@@ -139,6 +138,25 @@ export function CreateHabitDialog({
           </label>
 
           <label className="field">
+            <span>Detalhe do hábito</span>
+            <input
+              value={details}
+              maxLength={160}
+              onChange={(event) => setDetails(event.target.value)}
+              placeholder="Ex.: por 20 minutos depois do almoço"
+              aria-describedby={
+                submitted && !detailsValid ? "details-error" : undefined
+              }
+            />
+            <small>Descreva quando, onde ou por quanto tempo será feito.</small>
+            {submitted && !detailsValid && (
+              <small className="field-error" id="details-error">
+                Informe um detalhe observável com até 160 caracteres.
+              </small>
+            )}
+          </label>
+
+          <label className="field">
             <span>Versão mínima <em>opcional</em></span>
             <input
               value={minimumVersion}
@@ -146,23 +164,11 @@ export function CreateHabitDialog({
               onChange={(event) => setMinimumVersion(event.target.value)}
               placeholder="Ex.: Caminhar por pelo menos 5 minutos"
             />
-            <small>A menor versão que ainda conta nos dias difíceis.</small>
+            <small>
+              O menor esforço que você aceita como suficiente para marcar a
+              oportunidade como concluída.
+            </small>
           </label>
-
-          <div className="field">
-            <label htmlFor="frequency">Frequência semanal</label>
-            <div className="frequency-row">
-              <input
-                id="frequency"
-                type="range"
-                min="1"
-                max="7"
-                value={frequency}
-                onChange={(event) => changeFrequency(Number(event.target.value))}
-              />
-              <strong>{frequency}×</strong>
-            </div>
-          </div>
 
           <fieldset className="weekday-fieldset">
             <legend>Em quais dias?</legend>
@@ -181,11 +187,13 @@ export function CreateHabitDialog({
               ))}
             </div>
             <small>
-              Escolha {frequency} {frequency === 1 ? "dia" : "dias"}.
+              {weekdays.length === 0
+                ? "Escolha pelo menos um dia."
+                : `${weekdays.length} ${weekdays.length === 1 ? "vez" : "vezes"} por semana.`}
             </small>
             {submitted && !scheduleValid && (
               <small className="field-error">
-                Selecione exatamente {frequency} {frequency === 1 ? "dia" : "dias"}.
+                Selecione pelo menos um dia.
               </small>
             )}
           </fieldset>
@@ -204,7 +212,7 @@ export function CreateHabitDialog({
               className="button-primary"
               onClick={() => {
                 setSubmitted(true);
-                if (nameValid && scheduleValid) {
+                if (nameValid && detailsValid && scheduleValid) {
                   setSubmitted(false);
                   setStep(2);
                 }

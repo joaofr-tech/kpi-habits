@@ -44,6 +44,7 @@ export function HabitCard({
               : `Dia ${days}`}
           </span>
           <h2>{habit.name}</h2>
+          {habit.details && <p className="habit-details">{habit.details}</p>}
         </div>
         <button
           className="icon-button subtle"

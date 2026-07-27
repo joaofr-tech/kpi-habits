@@ -88,13 +88,17 @@ Ao clicar, deve ser aberto um modal de criação.
 O primeiro modal deve conter:
 
 - Nome do hábito;
-- Frequência semanal;
+- Detalhe obrigatório do hábito;
+- Versão mínima opcional;
+- Dias da semana em que o hábito será executado;
 - Botão para configurar o estimador;
 - Resultado calculado do Dia-Alvo;
 - Botão para salvar;
 - Botão para cancelar.
 
-O hábito não pode ser salvo sem um nome válido e sem o cálculo do Dia-Alvo.
+O hábito não pode ser salvo sem nome, detalhe, pelo menos um dia selecionado e o cálculo do Dia-Alvo.
+
+O nome deve ser curto, como `Caminhar`. O detalhe deve tornar a ação observável, como `por 20 minutos depois do almoço`.
 
 ---
 
@@ -108,10 +112,11 @@ O usuário deverá preencher:
 - Atrito para começar;
 - Estabilidade do contexto;
 - Hábito concorrente;
-- Recompensa ou aversão;
-- Frequência semanal.
+- Recompensa ou aversão.
 
 Cada variável deve ser apresentada como uma seleção categórica.
+
+Cada variável deve possuir exatamente três níveis: baixo ou favorável, médio ou neutro e alto ou desfavorável.
 
 Não deve ser solicitado que o usuário digite manualmente os multiplicadores numéricos.
 
@@ -177,12 +182,10 @@ O usuário deve conseguir registrar o resultado de uma oportunidade como:
 
 A aplicação não deve criar oportunidades nos dias que não pertencem à frequência planejada.
 
-TODO: definir como os dias da semana serão escolhidos.
-
-Default sugerido:
-
-- O usuário seleciona os dias da semana durante a criação;
-- A quantidade de dias selecionados deve ser igual à frequência semanal.
+- O usuário deve selecionar diretamente os dias da semana durante a criação;
+- Pelo menos um dia deve ser selecionado;
+- A frequência semanal deve ser derivada da quantidade de dias selecionados;
+- Não deve existir um segundo controle para informar a frequência.
 
 ---
 
@@ -280,11 +283,9 @@ Representa o esforço dentro do comportamento.
 
 | Nível | Valor | Descrição |
 |---|---:|---|
-| Muito simples | 0,70 | Ação curta e com uma única etapa |
 | Simples | 0,85 | Poucas etapas e pouco esforço |
 | Média | 1,00 | Exige atenção moderada |
 | Complexa | 1,25 | Múltiplas etapas ou esforço relevante |
-| Muito complexa | 1,50 | Sequência extensa, deslocamento ou grande esforço |
 
 ---
 
@@ -294,11 +295,9 @@ Representa o esforço necessário antes do início da ação.
 
 | Nível | Valor | Descrição |
 |---|---:|---|
-| Quase nenhum | 0,80 | Tudo está disponível e a ação começa em segundos |
 | Baixo | 0,90 | Existe uma preparação pequena |
 | Médio | 1,00 | Exige algumas decisões ou organização |
 | Alto | 1,20 | Exige preparação, deslocamento ou terceiros |
-| Muito alto | 1,40 | Existem muitas barreiras ou condições |
 
 ---
 
@@ -308,11 +307,9 @@ Representa o quanto o gatilho e o contexto se repetem.
 
 | Nível | Valor | Descrição |
 |---|---:|---|
-| Mesmo gatilho e lugar | 0,78 | A ação ocorre após o mesmo evento e no mesmo local |
-| Mesmo gatilho | 0,88 | O local pode variar, mas a ação anterior é estável |
+| Estável | 0,88 | O gatilho se repete de maneira previsível |
 | Horário aproximado | 1,00 | Existe apenas uma faixa de horário |
-| Contexto variável | 1,20 | Horário, local e situação mudam |
-| Sem gatilho definido | 1,40 | A ação depende de vontade ou oportunidade indefinida |
+| Variável | 1,20 | Horário, local e situação mudam |
 
 ---
 
@@ -323,10 +320,8 @@ Representa a força de uma ação que já ocorre naquele contexto.
 | Nível | Valor | Descrição |
 |---|---:|---|
 | Nenhum | 0,90 | Não existe resposta dominante |
-| Fraco | 1,00 | Existe alternativa, mas ela não é automática |
 | Moderado | 1,15 | Outra ação ocorre frequentemente |
 | Forte | 1,35 | A ação antiga ocorre quase sem pensar |
-| Muito forte | 1,55 | A ação antiga é repetida, automática e recompensadora |
 
 ---
 
@@ -336,19 +331,19 @@ Representa a experiência imediata real da atividade.
 
 | Nível | Valor | Descrição |
 |---|---:|---|
-| Muito agradável | 0,82 | A ação oferece prazer ou alívio imediato |
 | Agradável | 0,92 | A experiência costuma ser positiva |
 | Neutra | 1,00 | Não é prazerosa nem desagradável |
 | Desagradável | 1,15 | Exige tolerar desconforto ou tédio |
-| Muito aversiva | 1,30 | Provoca forte resistência |
 
 ---
 
 ## 5.6 Frequência semanal — F
 
-A frequência deve ser um número inteiro entre 1 e 7.
+A frequência deve ser derivada da quantidade de dias da semana selecionados e, portanto, será um número inteiro entre 1 e 7.
 
 Ela deve representar quantas vezes o hábito realmente será executado por semana, não uma frequência idealizada.
+
+O formulário não deve solicitar a frequência separadamente.
 
 ---
 
@@ -391,7 +386,7 @@ A metodologia SMART deve ser aplicada de maneira limitada ao planejamento do há
 
 ## Specific
 
-O hábito deve descrever uma ação observável.
+O cadastro deve separar o nome curto do hábito de seu detalhe observável.
 
 Exemplo inadequado:
 
@@ -399,7 +394,8 @@ Exemplo inadequado:
 
 Exemplo adequado:
 
-> Resolver exercícios de JavaScript por 25 minutos depois do almoço.
+> Nome: Resolver exercícios
+> Detalhe: por 25 minutos depois do almoço.
 
 ## Measurable
 
@@ -410,11 +406,9 @@ O comportamento deve possuir uma definição binária de execução:
 
 ## Achievable
 
-A ação deve possuir uma versão viável e compatível com a rotina.
+A ação pode possuir uma versão mínima opcional, que representa o menor esforço aceito como suficiente para marcar uma oportunidade como concluída.
 
-TODO: decidir se a versão mínima será armazenada na primeira versão.
-
-Default sugerido: incluir um campo opcional de versão mínima.
+O detalhe descreve a execução desejada. A versão mínima não substitui esse padrão: ela evita o pensamento “tudo ou nada”, reduz a barreira de retorno em dias difíceis e preserva a repetição.
 
 ## Relevant
 
@@ -571,12 +565,7 @@ Os modais devem:
 # 9. Modelo de dados
 
 ```ts
-type HabitFactorLevel =
-  | "VERY_LOW"
-  | "LOW"
-  | "MEDIUM"
-  | "HIGH"
-  | "VERY_HIGH";
+type HabitFactorLevel = "LOW" | "MEDIUM" | "HIGH";
 
 interface HabitFactors {
   complexity: HabitFactorLevel;
@@ -587,7 +576,6 @@ interface HabitFactors {
 }
 
 interface HabitSchedule {
-  frequencyPerWeek: number;
   weekdays: Weekday[];
 }
 
@@ -610,6 +598,7 @@ interface HabitLog {
 interface Habit {
   id: string;
   name: string;
+  details: string;
   createdAt: string;
   targetDays: number;
   factors: HabitFactors;

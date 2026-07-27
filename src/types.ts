@@ -1,9 +1,4 @@
-export type HabitFactorLevel =
-  | "VERY_LOW"
-  | "LOW"
-  | "MEDIUM"
-  | "HIGH"
-  | "VERY_HIGH";
+export type HabitFactorLevel = "LOW" | "MEDIUM" | "HIGH";
 
 export interface HabitFactors {
   complexity: HabitFactorLevel;
@@ -23,7 +18,6 @@ export type Weekday =
   | "SUNDAY";
 
 export interface HabitSchedule {
-  frequencyPerWeek: number;
   weekdays: Weekday[];
 }
 
@@ -37,6 +31,7 @@ export interface HabitLog {
 export interface Habit {
   id: string;
   name: string;
+  details: string;
   createdAt: string;
   targetDays: number;
   factors: HabitFactors;

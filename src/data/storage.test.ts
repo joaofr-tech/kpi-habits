@@ -5,6 +5,7 @@ import { loadHabits, saveHabits } from "./storage";
 const habit: Habit = {
   id: "habit-1",
   name: "Meditar",
+  details: "por 10 minutos ao acordar",
   createdAt: "2026-07-26",
   targetDays: 66,
   factors: {
@@ -14,7 +15,7 @@ const habit: Habit = {
     competingHabit: "MEDIUM",
     rewardAversion: "MEDIUM"
   },
-  schedule: { frequencyPerWeek: 1, weekdays: ["SUNDAY"] },
+  schedule: { weekdays: ["SUNDAY"] },
   logs: [],
   automaticityStatus: "TRACKING"
 };
@@ -25,12 +26,42 @@ describe("persistência", () => {
   it("salva e carrega o envelope versionado", () => {
     saveHabits([habit]);
     expect(loadHabits()).toEqual([habit]);
+    expect(JSON.parse(localStorage.getItem("kpi-habits")!).version).toBe(2);
+  });
+
+  it("migra hábitos da versão 1 sem alterar o Dia-Alvo ou os registros", () => {
+    const legacyHabit = {
+      ...habit,
+      details: undefined,
+      factors: {
+        ...habit.factors,
+        complexity: "VERY_LOW",
+        rewardAversion: "VERY_HIGH"
+      },
+      schedule: { frequencyPerWeek: 1, weekdays: ["SUNDAY"] }
+    };
+    localStorage.setItem(
+      "kpi-habits",
+      JSON.stringify({ version: 1, habits: [legacyHabit] })
+    );
+
+    expect(loadHabits()).toEqual([
+      {
+        ...habit,
+        details: "",
+        factors: {
+          ...habit.factors,
+          complexity: "LOW",
+          rewardAversion: "HIGH"
+        }
+      }
+    ]);
   });
 
   it("ignora JSON corrompido e versões desconhecidas", () => {
     localStorage.setItem("kpi-habits", "{");
     expect(loadHabits()).toEqual([]);
-    localStorage.setItem("kpi-habits", JSON.stringify({ version: 2, habits: [habit] }));
+    localStorage.setItem("kpi-habits", JSON.stringify({ version: 3, habits: [habit] }));
     expect(loadHabits()).toEqual([]);
   });
 });

@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { FACTORS } from "../data/factors";
 import type { Habit, HabitFactors } from "../types";
 import {
   calculateTargetDays,
@@ -8,22 +9,22 @@ import {
   setLog
 } from "./habits";
 
-const neutral: HabitFactors = {
+const middle: HabitFactors = {
   complexity: "MEDIUM",
   friction: "MEDIUM",
   contextStability: "MEDIUM",
-  competingHabit: "LOW",
+  competingHabit: "MEDIUM",
   rewardAversion: "MEDIUM"
 };
 
 const habit: Habit = {
   id: "1",
   name: "Ler",
+  details: "por 20 minutos antes de dormir",
   createdAt: "2026-07-20",
   targetDays: 66,
-  factors: neutral,
+  factors: middle,
   schedule: {
-    frequencyPerWeek: 3,
     weekdays: ["MONDAY", "WEDNESDAY", "FRIDAY"]
   },
   logs: [],
@@ -31,13 +32,24 @@ const habit: Habit = {
 };
 
 describe("regras de hábitos", () => {
-  it("calcula 66 dias para fatores médios e frequência diária", () => {
-    expect(calculateTargetDays(neutral, 7)).toBe(66);
+  it("calcula o Dia-Alvo com os níveis médios e frequência diária", () => {
+    expect(calculateTargetDays(middle, 7)).toBe(76);
   });
 
-  it("usa multiplicadores e arredondamento da especificação", () => {
-    expect(calculateTargetDays({ ...neutral, complexity: "VERY_LOW" }, 7)).toBe(46);
-    expect(calculateTargetDays({ ...neutral, rewardAversion: "VERY_HIGH" }, 1)).toBe(227);
+  it("usa os novos multiplicadores e arredondamento da especificação", () => {
+    expect(calculateTargetDays({ ...middle, complexity: "LOW" }, 7)).toBe(65);
+    expect(calculateTargetDays({ ...middle, rewardAversion: "HIGH" }, 1)).toBe(231);
+  });
+
+  it("oferece exatamente três níveis para cada fator", () => {
+    expect(FACTORS).toHaveLength(5);
+    for (const factor of FACTORS) {
+      expect(factor.options.map((option) => option.level)).toEqual([
+        "LOW",
+        "MEDIUM",
+        "HIGH"
+      ]);
+    }
   });
 
   it("considera a criação como dia 1 e atravessa meses", () => {

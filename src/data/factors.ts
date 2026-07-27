@@ -30,11 +30,9 @@ export const FACTORS: FactorDefinition[] = [
     label: "Complexidade",
     hint: "Quanto esforço existe dentro do comportamento?",
     options: levels([
-      ["VERY_LOW", "Muito simples", 0.7, "Ação curta, com uma única etapa."],
       ["LOW", "Simples", 0.85, "Poucas etapas e pouco esforço."],
       ["MEDIUM", "Média", 1, "Exige atenção moderada."],
-      ["HIGH", "Complexa", 1.25, "Múltiplas etapas ou esforço relevante."],
-      ["VERY_HIGH", "Muito complexa", 1.5, "Sequência extensa, deslocamento ou grande esforço."]
+      ["HIGH", "Complexa", 1.25, "Múltiplas etapas ou esforço relevante."]
     ])
   },
   {
@@ -42,11 +40,9 @@ export const FACTORS: FactorDefinition[] = [
     label: "Atrito para começar",
     hint: "O que precisa acontecer antes de você começar?",
     options: levels([
-      ["VERY_LOW", "Quase nenhum", 0.8, "Tudo disponível; você começa em segundos."],
       ["LOW", "Baixo", 0.9, "Existe uma preparação pequena."],
       ["MEDIUM", "Médio", 1, "Exige algumas decisões ou organização."],
-      ["HIGH", "Alto", 1.2, "Exige preparo, deslocamento ou terceiros."],
-      ["VERY_HIGH", "Muito alto", 1.4, "Existem muitas barreiras ou condições."]
+      ["HIGH", "Alto", 1.2, "Exige preparo, deslocamento ou terceiros."]
     ])
   },
   {
@@ -54,11 +50,9 @@ export const FACTORS: FactorDefinition[] = [
     label: "Estabilidade do contexto",
     hint: "Quão previsível é o gatilho da ação?",
     options: levels([
-      ["VERY_LOW", "Mesmo gatilho e lugar", 0.78, "Mesmo evento anterior e mesmo local."],
-      ["LOW", "Mesmo gatilho", 0.88, "O local varia, mas a ação anterior é estável."],
+      ["LOW", "Estável", 0.88, "O gatilho se repete de maneira previsível."],
       ["MEDIUM", "Horário aproximado", 1, "Existe apenas uma faixa de horário."],
-      ["HIGH", "Contexto variável", 1.2, "Horário, local e situação mudam."],
-      ["VERY_HIGH", "Sem gatilho definido", 1.4, "Depende de vontade ou oportunidade indefinida."]
+      ["HIGH", "Variável", 1.2, "Horário, local e situação mudam."]
     ])
   },
   {
@@ -66,11 +60,9 @@ export const FACTORS: FactorDefinition[] = [
     label: "Hábito concorrente",
     hint: "Já existe outra resposta automática nesse contexto?",
     options: levels([
-      ["VERY_LOW", "Nenhum", 0.9, "Não existe resposta dominante."],
-      ["LOW", "Fraco", 1, "Existe uma alternativa, mas não é automática."],
+      ["LOW", "Nenhum", 0.9, "Não existe resposta dominante."],
       ["MEDIUM", "Moderado", 1.15, "Outra ação ocorre frequentemente."],
-      ["HIGH", "Forte", 1.35, "A ação antiga ocorre quase sem pensar."],
-      ["VERY_HIGH", "Muito forte", 1.55, "A ação antiga é automática e recompensadora."]
+      ["HIGH", "Forte", 1.35, "A ação antiga ocorre quase sem pensar."]
     ])
   },
   {
@@ -78,11 +70,9 @@ export const FACTORS: FactorDefinition[] = [
     label: "Recompensa ou aversão",
     hint: "Como a atividade é sentida imediatamente?",
     options: levels([
-      ["VERY_LOW", "Muito agradável", 0.82, "Oferece prazer ou alívio imediato."],
       ["LOW", "Agradável", 0.92, "A experiência costuma ser positiva."],
       ["MEDIUM", "Neutra", 1, "Não é prazerosa nem desagradável."],
-      ["HIGH", "Desagradável", 1.15, "Exige tolerar desconforto ou tédio."],
-      ["VERY_HIGH", "Muito aversiva", 1.3, "Provoca forte resistência."]
+      ["HIGH", "Desagradável", 1.15, "Exige tolerar desconforto ou tédio."]
     ])
   }
 ];

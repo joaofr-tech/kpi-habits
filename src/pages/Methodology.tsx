@@ -48,11 +48,16 @@ export function Methodology() {
               <span className="section-number">02</span>
               <h2>Proteja a continuidade,<br />não a perfeição.</h2>
               <p>
-                A versão mínima é a menor execução que preserva a identidade do
-                hábito em um dia difícil. Uma falha não zera o projeto: retorne
-                na próxima oportunidade, examine o obstáculo e reduza o tamanho
-                da ação quando necessário.
+                O detalhe descreve a execução desejada do hábito. A versão
+                mínima é o menor esforço que você aceita como suficiente para
+                marcar uma oportunidade como concluída em um dia difícil. Uma
+                falha não zera o projeto: retorne na próxima oportunidade,
+                examine o obstáculo e reduza o tamanho da ação quando necessário.
               </p>
+              <blockquote>
+                <strong>Por que um mínimo, e não um padrão?</strong>
+                <p>Um padrão fixo transforma dias imperfeitos em fracasso. O mínimo combate o pensamento “tudo ou nada”, reduz a barreira para começar e protege a repetição. Ele é uma saída para dias difíceis, não o comportamento ideal de todos os dias.</p>
+              </blockquote>
               <blockquote>
                 <strong>Dias do projeto</strong>
                 <p>Contam o tempo corrido desde a criação. O primeiro dia é o dia 1 e nenhuma falha reinicia a contagem.</p>
