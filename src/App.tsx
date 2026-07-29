@@ -1,13 +1,19 @@
 import { HabitsProvider } from "./context/HabitsContext";
+import { GoalsProvider } from "./context/GoalsContext";
 import { Dashboard } from "./pages/Dashboard";
+import { Goals } from "./pages/Goals";
 import { Methodology } from "./pages/Methodology";
 
 export default function App() {
   const page = window.location.pathname === "/metodologia"
     ? <Methodology />
-    : <Dashboard />;
+    : window.location.pathname === "/metas"
+      ? <Goals />
+      : <Dashboard />;
 
   return (
-    <HabitsProvider>{page}</HabitsProvider>
+    <HabitsProvider>
+      <GoalsProvider>{page}</GoalsProvider>
+    </HabitsProvider>
   );
 }

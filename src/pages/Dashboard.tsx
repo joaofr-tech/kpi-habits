@@ -21,7 +21,11 @@ export function Dashboard() {
 
   return (
     <div className="page-shell">
-      <AppHeader onAdd={() => setCreating(true)} />
+      <AppHeader
+        activeSection="habits"
+        addLabel="Novo hábito"
+        onAdd={() => setCreating(true)}
+      />
       <main className="dashboard">
         {habits.length === 0 ? (
           <section className="empty-state">
