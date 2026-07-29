@@ -45,4 +45,13 @@ export interface Habit {
     | "EXTENDED";
 }
 
+export interface Goal {
+  id: string;
+  name: string;
+  specification: string;
+  deadline: string;
+  motivation: string;
+  createdAt: string;
+}
+
 export type FactorKey = keyof HabitFactors;
