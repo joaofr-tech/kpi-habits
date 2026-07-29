@@ -8,7 +8,7 @@
 
 ### Objetivo
 
-Criar uma aplicação web minimalista para calcular e acompanhar um KPI pessoal de formação de hábitos.
+Criar uma aplicação web minimalista para calcular e acompanhar um KPI pessoal de formação de hábitos e registrar metas pessoais simples.
 
 Cada hábito terá:
 
@@ -37,7 +37,8 @@ A primeira versão deve permitir:
 7. Visualizar consistência;
 8. Excluir um hábito;
 9. Persistir os dados localmente;
-10. Abrir uma página explicando a metodologia.
+10. Abrir uma página explicando a metodologia;
+11. Criar e visualizar metas pessoais simples.
 
 ---
 
@@ -53,7 +54,8 @@ Não fazem parte desta versão:
 - Notificações;
 - Gamificação além do acompanhamento visual;
 - Categorias;
-- Metas anuais;
+- Planejamento anual e ciclos de metas;
+- Progresso quantitativo, conclusão, edição ou gestão avançada de metas;
 - Aplicação nativa;
 - Inteligência artificial;
 - Recomendações personalizadas automáticas.
@@ -278,6 +280,48 @@ A página metodológica deve possuir uma ação clara para retornar ao painel de
 
 ---
 
+## RF13 — Abrir seção de metas
+
+O cabeçalho deve permitir navegar entre as seções `Hábitos` e `Metas`.
+
+A seção de metas deve possuir a rota `/metas`, seguir a mesma direção visual do painel de hábitos e apresentar um estado vazio quando ainda não houver metas cadastradas.
+
+---
+
+## RF14 — Criar meta
+
+A seção de metas deve possuir um botão `Nova meta`.
+
+Ao clicar, deve ser aberto um modal de uma etapa com os campos obrigatórios:
+
+- Nome, com até 80 caracteres;
+- Especificação, com até 240 caracteres;
+- Data-limite;
+- Motivação, com até 300 caracteres.
+
+A data-limite deve aceitar o dia atual ou uma data futura. O modal deve exibir mensagens de validação próximas aos campos e possuir as ações `Cancelar` e `Criar meta`.
+
+Ao salvar, a meta deve aparecer imediatamente na área de exibição. Metas mais recentes devem ser exibidas primeiro.
+
+---
+
+## RF15 — Persistir e visualizar metas
+
+As metas devem ser persistidas no armazenamento local do navegador e restauradas após recarregar a página.
+
+Cada card deve exibir:
+
+- Nome;
+- Especificação;
+- Data-limite;
+- Motivação.
+
+Dados ausentes, inválidos ou pertencentes a uma versão desconhecida não devem quebrar a aplicação.
+
+Nesta versão, metas não possuem edição, exclusão, conclusão, progresso quantitativo nem vínculo com hábitos.
+
+---
+
 # 5. Variáveis do estimador
 
 ## 5.1 Complexidade — C
@@ -385,11 +429,13 @@ Se o teste não for aprovado:
 
 # 7. Aplicação da metodologia SMART
 
-A metodologia SMART deve ser aplicada de maneira limitada ao planejamento do hábito.
+A metodologia SMART deve ser aplicada ao planejamento do hábito e, de forma direta, ao cadastro de metas simples.
 
 ## Specific
 
 O cadastro deve separar o nome curto do hábito de seu detalhe observável.
+
+No cadastro de metas, a especificação deve descrever com clareza o resultado desejado, incluindo números ou critérios concretos quando forem relevantes.
 
 Exemplo inadequado:
 
@@ -421,9 +467,13 @@ TODO: decidir se haverá um campo de objetivo.
 
 Default sugerido: não incluir no cadastro inicial para preservar simplicidade.
 
+Nas metas, o campo `Motivação` deve registrar por que o resultado importa e qual benefício pessoal ele pretende produzir.
+
 ## Time-bound
 
 O Dia-Alvo oferece um período definido para acompanhamento e posterior avaliação.
+
+Nas metas, a `Data-limite` define até quando o resultado é pretendido.
 
 ---
 
@@ -469,6 +519,17 @@ O botão deve:
 - Abrir o modal de criação;
 - Ter área de clique confortável;
 - Exibir estado de foco.
+
+---
+
+### Navegação
+
+Nas páginas principais, o cabeçalho deve oferecer links para `Hábitos` e `Metas`, indicar a seção ativa e manter a ação de criação contextual:
+
+- `Novo hábito` em `/`;
+- `Nova meta` em `/metas`.
+
+Em telas pequenas, os rótulos podem ser condensados desde que links e ações continuem acessíveis.
 
 ---
 
@@ -541,7 +602,15 @@ O card deve ser compreensível sem abrir uma tela secundária.
 
 ---
 
-## 8.5 Rodapé
+## 8.5 Card de meta
+
+Os cards de metas devem usar a mesma grade responsiva e densidade visual dos cards de hábito.
+
+Cada card deve apresentar nome, especificação, data-limite e motivação sem exigir uma tela secundária.
+
+---
+
+## 8.6 Rodapé
 
 O rodapé deve exibir centralizada horizontalmente a frase:
 
@@ -561,7 +630,7 @@ Não utilizar animação chamativa.
 
 ---
 
-## 8.6 Botão metodológico
+## 8.7 Botão metodológico
 
 No canto inferior direito deve existir um botão:
 
@@ -575,7 +644,7 @@ Em dispositivos móveis, o botão não deve encobrir conteúdo ou ações dos ca
 
 ---
 
-## 8.7 Modais
+## 8.8 Modais
 
 Os modais devem:
 
@@ -641,4 +710,18 @@ interface Habit {
     | "READY_FOR_TEST"
     | "CONSOLIDATED"
     | "EXTENDED";
+}
+
+interface Goal {
+  id: string;
+  name: string;
+  specification: string;
+  deadline: string;
+  motivation: string;
+  createdAt: string;
+}
+
+interface GoalsData {
+  version: 1;
+  goals: Goal[];
 }
