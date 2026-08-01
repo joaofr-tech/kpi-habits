@@ -5,6 +5,7 @@ import { GoalCard } from "../components/GoalCard";
 import { FileIcon, PlusIcon } from "../components/Icons";
 import { StorageWarning } from "../components/StorageWarning";
 import { useGoals } from "../context/GoalsContext";
+import { AppLink } from "../navigation";
 import type { Goal } from "../types";
 
 export function Goals() {
@@ -79,13 +80,13 @@ export function Goals() {
         <p>Believe it first.</p>
         <span></span>
       </footer>
-      <a
+      <AppLink
         className="method-button"
         href="/metodologia"
         aria-label="Abrir metodologia"
       >
         <FileIcon />
-      </a>
+      </AppLink>
       <GoalDialog
         open={dialogOpen}
         goal={goalBeingEdited}

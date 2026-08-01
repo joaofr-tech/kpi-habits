@@ -5,11 +5,38 @@ import { swipeUp } from "./touch";
 test("cria, restaura, edita e exclui uma meta", async ({ page, isMobile }) => {
   if (isMobile) await page.setViewportSize({ width: 360, height: 640 });
   await installHapticProbe(page);
-  await page.goto("/metas");
+  await page.goto("/");
+  await page.evaluate(() => {
+    (window as Window & { __navigationMarker?: string }).__navigationMarker =
+      "same-document";
+  });
+  await page.getByRole("link", { name: "Metas" }).click();
+  await expect(page).toHaveURL(/\/metas$/);
   await expect(page.getByRole("link", { name: "Metas" })).toHaveAttribute(
     "aria-current",
     "page"
   );
+  expect(
+    await page.evaluate(
+      () =>
+        (window as Window & { __navigationMarker?: string }).__navigationMarker
+    )
+  ).toBe("same-document");
+
+  await page.goBack();
+  await expect(page).toHaveURL(/\/$/);
+  await expect(page.getByRole("link", { name: "Hábitos" })).toHaveAttribute(
+    "aria-current",
+    "page"
+  );
+  await page.goForward();
+  await expect(page).toHaveURL(/\/metas$/);
+  expect(
+    await page.evaluate(
+      () =>
+        (window as Window & { __navigationMarker?: string }).__navigationMarker
+    )
+  ).toBe("same-document");
 
   await page.getByRole("button", { name: /criar primeira meta/i }).click();
   await page.getByLabel("Nome").fill("Criar uma reserva");

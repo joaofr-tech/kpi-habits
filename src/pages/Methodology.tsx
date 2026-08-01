@@ -1,12 +1,15 @@
 import { AppHeader } from "../components/AppHeader";
 import { ArrowLeftIcon } from "../components/Icons";
+import { AppLink } from "../navigation";
 
 export function Methodology() {
   return (
     <div className="page-shell methodology-page">
       <AppHeader />
       <main className="methodology">
-        <a href="/" className="back-link"><ArrowLeftIcon /> Voltar ao painel</a>
+        <AppLink href="/" className="back-link">
+          <ArrowLeftIcon /> Voltar ao painel
+        </AppLink>
         <header className="article-header">
           <span className="eyebrow">Metodologia</span>
           <h1>Repetir é<br />construir.</h1>
@@ -148,10 +151,10 @@ export function Methodology() {
             </section>
           </article>
         </div>
-        <a href="/" className="article-cta">
+        <AppLink href="/" className="article-cta">
           <span>Leve a ideia para a rotina</span>
           <strong>Voltar aos meus hábitos →</strong>
-        </a>
+        </AppLink>
       </main>
       <footer className="app-footer">
         <p>Eu sou o melhor</p>

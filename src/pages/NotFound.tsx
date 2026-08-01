@@ -1,4 +1,5 @@
 import { AppHeader } from "../components/AppHeader";
+import { AppLink } from "../navigation";
 
 export function NotFound() {
   return (
@@ -16,9 +17,9 @@ export function NotFound() {
               Este endereço não existe. Volte ao painel para continuar
               acompanhando seus hábitos.
             </p>
-            <a className="button-primary" href="/">
+            <AppLink className="button-primary" href="/">
               Voltar ao painel
-            </a>
+            </AppLink>
           </div>
         </section>
       </main>

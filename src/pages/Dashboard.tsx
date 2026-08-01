@@ -6,6 +6,7 @@ import { HabitCard } from "../components/HabitCard";
 import { FileIcon, PlusIcon } from "../components/Icons";
 import { StorageWarning } from "../components/StorageWarning";
 import { useHabits } from "../context/HabitsContext";
+import { AppLink } from "../navigation";
 import type { Habit } from "../types";
 
 export function Dashboard() {
@@ -70,13 +71,13 @@ export function Dashboard() {
         <p>Eu não quero, mas tenho que fazer.</p>
         <span>Então, que importa o que eu quero?</span>
       </footer>
-      <a
+      <AppLink
         className="method-button"
         href="/metodologia"
         aria-label="Abrir metodologia"
       >
         <FileIcon />
-      </a>
+      </AppLink>
       <CreateHabitDialog
         open={creating}
         onClose={() => setCreating(false)}
