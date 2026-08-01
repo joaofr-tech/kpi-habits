@@ -38,7 +38,7 @@ A primeira versão deve permitir:
 8. Excluir um hábito;
 9. Persistir os dados localmente;
 10. Abrir uma página explicando a metodologia;
-11. Criar, visualizar, editar e excluir metas pessoais simples.
+11. Criar, visualizar, editar, concluir, reabrir e excluir metas pessoais simples.
 
 ---
 
@@ -55,7 +55,7 @@ Não fazem parte desta versão:
 - Gamificação além do acompanhamento visual;
 - Categorias;
 - Planejamento anual e ciclos de metas;
-- Progresso quantitativo, conclusão ou gestão avançada de metas;
+- Progresso quantitativo ou gestão avançada de metas;
 - Aplicação nativa;
 - Inteligência artificial;
 - Recomendações personalizadas automáticas.
@@ -188,6 +188,7 @@ O usuário deve conseguir registrar o resultado de uma oportunidade como:
 A aplicação não deve criar oportunidades nos dias que não pertencem à frequência planejada.
 
 - O usuário deve selecionar diretamente os dias da semana durante a criação;
+- A interface deve oferecer uma ação para selecionar ou limpar todos os dias;
 - Pelo menos um dia deve ser selecionado;
 - A frequência semanal deve ser derivada da quantidade de dias selecionados;
 - Não deve existir um segundo controle para informar a frequência.
@@ -318,7 +319,10 @@ Cada card deve exibir:
 
 Dados ausentes, inválidos ou pertencentes a uma versão desconhecida não devem quebrar a aplicação.
 
-Nesta versão, metas não possuem conclusão, progresso quantitativo nem vínculo com hábitos.
+Metas podem ser declaradas como cumpridas e reabertas. A conclusão deve registrar
+a data local atual, ser persistida e permanecer opcional para manter compatibilidade
+com metas já armazenadas. Metas não possuem progresso quantitativo nem vínculo com
+hábitos.
 
 ---
 
@@ -339,6 +343,24 @@ deve solicitar uma confirmação clara ao usuário.
 
 Ao confirmar, a meta deve ser removida imediatamente e a exclusão deve ser
 persistida no armazenamento local.
+
+---
+
+## RF18 — Concluir e reabrir meta
+
+Cada card de meta deve possuir uma ação para declarar a meta como cumprida.
+
+Ao concluir:
+
+- A data local atual deve ser registrada;
+- A alteração deve ser persistida;
+- O card deve indicar claramente o estado e a data de cumprimento;
+- Metas cumpridas devem aparecer após as metas ativas, preservando a ordem
+  relativa dentro de cada grupo.
+
+Uma meta cumprida deve poder ser reaberta. Ao reabrir, a data de cumprimento deve
+ser removida e a meta deve voltar ao grupo de metas ativas. Concluir ou reabrir
+não deve alterar o identificador, a data de criação ou a data-limite.
 
 ---
 
@@ -626,7 +648,8 @@ O card deve ser compreensível sem abrir uma tela secundária.
 
 Os cards de metas devem usar a mesma grade responsiva e densidade visual dos cards de hábito.
 
-Cada card deve apresentar nome, especificação, data-limite e motivação sem exigir uma tela secundária.
+Cada card deve apresentar nome, especificação, data-limite, motivação, estado de
+cumprimento e sua ação correspondente sem exigir uma tela secundária.
 
 ---
 
@@ -690,8 +713,8 @@ movimento do sistema.
 
 Quando a API de vibração estiver disponível, ações importantes concluídas devem
 emitir um único pulso tátil discreto. São ações importantes: salvar hábitos ou
-metas, registrar a execução diária, excluir após confirmação, estender o
-acompanhamento e consolidar um hábito.
+metas, registrar a execução diária, excluir após confirmação, concluir ou reabrir
+uma meta, estender o acompanhamento e consolidar um hábito.
 
 A ausência ou falha da API não deve impedir a ação principal. Abrir, fechar ou
 cancelar modais, navegar, selecionar campos e falhar em validações não devem
@@ -756,6 +779,7 @@ interface Goal {
   deadline: string;
   motivation: string;
   createdAt: string;
+  completedAt?: string;
 }
 
 interface GoalsData {

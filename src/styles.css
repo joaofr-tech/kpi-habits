@@ -75,7 +75,7 @@ a { color: inherit; }
 }
 .primary-nav a:hover { color: var(--ink); }
 .primary-nav a.active { color: white; background: var(--ink); }
-.add-button, .button-primary, .button-secondary {
+.add-button, .button-primary, .button-secondary, .button-danger {
   border: 0;
   border-radius: 999px;
   min-height: 48px;
@@ -96,6 +96,8 @@ a { color: inherit; }
 .button-primary:disabled { opacity: .35; cursor: not-allowed; }
 .button-secondary { background: transparent; border: 1px solid var(--line); }
 .button-secondary:hover { background: #ebe8e1; }
+.button-danger { color: white; background: #9f2d22; }
+.button-danger:hover { background: #812219; }
 .icon-button {
   width: 42px; height: 42px; padding: 0;
   display: grid; place-items: center;
@@ -271,6 +273,31 @@ a { color: inherit; }
   border-top: 1px solid #ebe8e1;
 }
 
+.goal-card.completed {
+  background: #eeece6;
+  border-color: #d7d3ca;
+}
+.goal-card.completed h2 {
+  text-decoration: line-through;
+  text-decoration-thickness: 1px;
+}
+.goal-completion {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-top: 16px;
+  margin-top: 18px;
+  border-top: 1px solid #dedbd3;
+}
+.goal-completion > span { color: var(--muted); font-size: 11px; }
+.goal-completion button {
+  min-height: 42px;
+  padding: 0 16px;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
 .app-footer {
   width: min(1180px, calc(100% - 48px)); margin: auto auto 0;
   padding: 18px 0 22px; display: flex; align-items: baseline; justify-content: center; gap: 12px;
@@ -313,6 +340,8 @@ a { color: inherit; }
   -webkit-overflow-scrolling: touch;
 }
 .dialog-intro { margin: 0 0 25px; color: var(--muted); line-height: 1.6; }
+.confirmation-dialog { width: min(500px, calc(100% - 32px)); }
+.confirmation-body p { margin: 0; color: var(--muted); line-height: 1.6; }
 .field, .factor-field { display: block; margin-bottom: 22px; }
 .field > span, .field > label, .factor-field > span, .weekday-fieldset legend {
   display: block; margin-bottom: 8px; font-size: 13px; font-weight: 700;
@@ -337,6 +366,20 @@ a { color: inherit; }
 .frequency-row input { flex: 1; accent-color: var(--ink); }
 .frequency-row strong { width: 50px; font: 700 24px "Manrope"; text-align: right; }
 .weekday-fieldset { padding: 0; margin: 0 0 25px; border: 0; }
+.weekday-select-all {
+  display: block;
+  margin: -31px 0 11px auto;
+  padding: 4px 0;
+  border: 0;
+  color: var(--muted);
+  background: transparent;
+  font-size: 12px;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.weekday-select-all:hover { color: var(--ink); }
 .weekday-picker { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
 .weekday-picker button {
   aspect-ratio: 1; min-height: 43px; border: 1px solid var(--line); border-radius: 50%; background: white; font-weight: 700; cursor: pointer;
@@ -430,6 +473,8 @@ a { color: inherit; }
   .add-button { width: 48px; padding: 0; }
   .habit-card { padding: 20px; }
   .goal-card { min-height: 0; padding: 20px; }
+  .goal-completion { align-items: stretch; flex-direction: column; }
+  .goal-completion button { width: 100%; }
   .progress-label, .metric-row, .today-label { display: none; }
   .mobile-card-summary {
     display: flex; justify-content: space-between; align-items: baseline;

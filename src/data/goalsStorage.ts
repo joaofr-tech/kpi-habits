@@ -17,6 +17,9 @@ function normalizeGoal(value: unknown): Goal | null {
   const name = normalizeText(goal.name, 80);
   const specification = normalizeText(goal.specification, 240);
   const motivation = normalizeText(goal.motivation, 300);
+  const completedAt = isLocalDateKey(goal.completedAt)
+    ? goal.completedAt
+    : undefined;
 
   if (
     typeof goal.id !== 'string' ||
@@ -36,7 +39,8 @@ function normalizeGoal(value: unknown): Goal | null {
     specification,
     deadline: goal.deadline,
     motivation,
-    createdAt: goal.createdAt
+    createdAt: goal.createdAt,
+    ...(completedAt ? { completedAt } : {})
   };
 }
 

@@ -2,6 +2,7 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { GoalsProvider } from "../context/GoalsContext";
+import { toLocalDateKey } from "../domain/date";
 import { triggerHapticFeedback } from "../ui/haptics";
 import { Goals } from "./Goals";
 
@@ -58,7 +59,7 @@ describe("metas", () => {
 
   });
 
-  it("edita preservando a identidade e só exclui após confirmação", async () => {
+  it("edita preservando a identidade e só exclui no diálogo personalizado", async () => {
     const originalGoal = {
       id: "goal-1",
       name: "Criar uma reserva",
@@ -107,26 +108,102 @@ describe("metas", () => {
     });
     expect(triggerHapticFeedback).toHaveBeenCalledTimes(1);
 
-    const confirm = vi.spyOn(window, "confirm").mockReturnValueOnce(false);
     await user.click(
       screen.getByRole("button", { name: "Excluir Criar reserva de emergência" })
     );
-    expect(confirm).toHaveBeenCalledWith(
-      "Excluir a meta “Criar reserva de emergência”?"
-    );
+    expect(
+      screen.getByRole("heading", {
+        name: "Excluir a meta “Criar reserva de emergência”?"
+      })
+    ).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Cancelar" }));
     expect(
       screen.getByRole("heading", { name: "Criar reserva de emergência" })
     ).toBeInTheDocument();
     expect(triggerHapticFeedback).toHaveBeenCalledTimes(1);
 
-    confirm.mockReturnValueOnce(true);
     await user.click(
       screen.getByRole("button", { name: "Excluir Criar reserva de emergência" })
     );
+    await user.click(screen.getByRole("button", { name: "Excluir meta" }));
     expect(
       screen.getByRole("heading", { name: /uma meta clara transforma/i })
     ).toBeInTheDocument();
     expect(JSON.parse(localStorage.getItem("kpi-goals")!).goals).toEqual([]);
     expect(triggerHapticFeedback).toHaveBeenCalledTimes(2);
+  });
+
+  it("persiste a conclusão, move a meta para o fim e permite reabrir", async () => {
+    const firstGoal = {
+      id: "goal-1",
+      name: "Criar uma reserva",
+      specification: "Guardar R$ 10.000 em uma conta separada",
+      deadline: "2099-12-31",
+      motivation: "Ter segurança para lidar com imprevistos",
+      createdAt: "2026-07-29"
+    };
+    const secondGoal = {
+      ...firstGoal,
+      id: "goal-2",
+      name: "Fazer uma viagem"
+    };
+    localStorage.setItem(
+      "kpi-goals",
+      JSON.stringify({ version: 1, goals: [firstGoal, secondGoal] })
+    );
+    const user = userEvent.setup();
+    const view = render(
+      <GoalsProvider>
+        <Goals />
+      </GoalsProvider>
+    );
+
+    await user.click(
+      screen.getByRole("button", {
+        name: "Marcar Criar uma reserva como cumprida"
+      })
+    );
+
+    expect(
+      [...document.querySelectorAll(".goal-card h2")].map(
+        (heading) => heading.textContent
+      )
+    ).toEqual(["Fazer uma viagem", "Criar uma reserva"]);
+    expect(JSON.parse(localStorage.getItem("kpi-goals")!).goals[0]).toEqual({
+      ...firstGoal,
+      completedAt: toLocalDateKey()
+    });
+    expect(triggerHapticFeedback).toHaveBeenCalledTimes(1);
+
+    view.unmount();
+    render(
+      <GoalsProvider>
+        <Goals />
+      </GoalsProvider>
+    );
+    expect(
+      document.querySelector(".goal-card.completed .goal-completion time")
+    ).toHaveAttribute("dateTime", toLocalDateKey());
+
+    await user.click(
+      screen.getByRole("button", { name: "Editar Criar uma reserva" })
+    );
+    await user.click(screen.getByRole("button", { name: "Salvar alterações" }));
+    expect(
+      screen.getByRole("button", { name: "Reabrir meta Criar uma reserva" })
+    ).toBeInTheDocument();
+
+    await user.click(
+      screen.getByRole("button", { name: "Reabrir meta Criar uma reserva" })
+    );
+    expect(
+      [...document.querySelectorAll(".goal-card h2")].map(
+        (heading) => heading.textContent
+      )
+    ).toEqual(["Criar uma reserva", "Fazer uma viagem"]);
+    expect(
+      JSON.parse(localStorage.getItem("kpi-goals")!).goals[0].completedAt
+    ).toBeUndefined();
+    expect(triggerHapticFeedback).toHaveBeenCalledTimes(3);
   });
 });

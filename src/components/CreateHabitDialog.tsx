@@ -64,6 +64,14 @@ export function CreateHabitDialog({
     });
   }
 
+  function toggleAllWeekdays() {
+    setWeekdays((current) =>
+      current.length === WEEKDAYS.length
+        ? []
+        : WEEKDAYS.map((day) => day.key)
+    );
+  }
+
   const scheduleValid = weekdays.length > 0;
   const nameValid = name.trim().length > 0 && name.trim().length <= 80;
   const detailsValid =
@@ -174,6 +182,16 @@ export function CreateHabitDialog({
 
           <fieldset className="weekday-fieldset">
             <legend>Em quais dias?</legend>
+            <button
+              type="button"
+              className="weekday-select-all"
+              aria-pressed={weekdays.length === WEEKDAYS.length}
+              onClick={toggleAllWeekdays}
+            >
+              {weekdays.length === WEEKDAYS.length
+                ? "Limpar seleção"
+                : "Selecionar todos"}
+            </button>
             <div className="weekday-picker">
               {WEEKDAYS.map((day) => (
                 <button

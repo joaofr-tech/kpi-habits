@@ -54,5 +54,27 @@ describe("painel", () => {
       screen.getByText(/informe um detalhe observável/i)
     ).toBeInTheDocument();
     expect(screen.getByText(/selecione pelo menos um dia/i)).toBeInTheDocument();
+
+    await user.click(
+      screen.getByRole("button", { name: "Selecionar todos" })
+    );
+    for (const day of [
+      "Domingo",
+      "Segunda-feira",
+      "Terça-feira",
+      "Quarta-feira",
+      "Quinta-feira",
+      "Sexta-feira",
+      "Sábado"
+    ]) {
+      expect(screen.getByRole("button", { name: day })).toHaveAttribute(
+        "aria-pressed",
+        "true"
+      );
+    }
+    expect(screen.getByText("7 vezes por semana.")).toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: "Limpar seleção" }));
+    expect(screen.getByText("Escolha pelo menos um dia.")).toBeInTheDocument();
   });
 });

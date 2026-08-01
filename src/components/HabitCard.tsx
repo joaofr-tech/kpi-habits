@@ -29,13 +29,6 @@ export function HabitCard({
   const scheduled = isScheduledDate(habit, today);
   const progress = Math.min(100, Math.round((days / habit.targetDays) * 100));
 
-  function confirmDelete() {
-    if (window.confirm(`Excluir “${habit.name}” e todo o seu histórico?`)) {
-      onDelete();
-      triggerHapticFeedback();
-    }
-  }
-
   function logToday(status: HabitLogStatus | null) {
     onLog(status);
     triggerHapticFeedback();
@@ -50,7 +43,7 @@ export function HabitCard({
         </div>
         <button
           className="icon-button subtle"
-          onClick={confirmDelete}
+          onClick={onDelete}
           aria-label={`Excluir ${habit.name}`}
         >
           <TrashIcon />

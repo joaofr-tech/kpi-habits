@@ -19,19 +19,8 @@ test("cria, persiste, registra e exclui um hábito", async ({
     .getByLabel(/detalhe do hábito/i)
     .fill("por 20 minutos depois do almoço");
 
-  const weekday = new Intl.DateTimeFormat("en-US", { weekday: "long" })
-    .format(new Date())
-    .toUpperCase();
-  const labels: Record<string, string> = {
-    SUNDAY: "Domingo",
-    MONDAY: "Segunda-feira",
-    TUESDAY: "Terça-feira",
-    WEDNESDAY: "Quarta-feira",
-    THURSDAY: "Quinta-feira",
-    FRIDAY: "Sexta-feira",
-    SATURDAY: "Sábado"
-  };
-  await page.getByRole("button", { name: labels[weekday] }).click();
+  await page.getByRole("button", { name: "Selecionar todos" }).click();
+  await expect(page.getByText("7 vezes por semana.")).toBeVisible();
   await page.getByRole("button", { name: /configurar estimador/i }).click();
   expect(await hapticPatterns(page)).toEqual([]);
   await page.getByRole("button", { name: /salvar hábito/i }).click();
@@ -57,8 +46,16 @@ test("cria, persiste, registra e exclui um hábito", async ({
       : page.getByText("100%", { exact: true })
   ).toBeVisible();
 
-  page.on("dialog", (dialog) => dialog.accept());
   await page.getByRole("button", { name: /excluir caminhar/i }).click();
+  await expect(
+    page.getByRole("heading", { name: "Excluir “Caminhar”?" })
+  ).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(page.getByRole("heading", { name: "Caminhar" })).toBeVisible();
+  expect(await hapticPatterns(page)).toEqual([10]);
+
+  await page.getByRole("button", { name: /excluir caminhar/i }).click();
+  await page.getByRole("button", { name: "Excluir hábito" }).click();
   expect(await hapticPatterns(page)).toEqual([10, 10]);
   await expect(page.getByText(/seu primeiro hábito começa/i)).toBeVisible();
   await page.getByRole("link", { name: /abrir metodologia/i }).click();

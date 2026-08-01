@@ -124,19 +124,52 @@ test("cria, restaura, edita e exclui uma meta", async ({ page, isMobile }) => {
     page.getByText("Ter tranquilidade diante de imprevistos")
   ).toBeVisible();
 
-  const confirmation = page.waitForEvent("dialog");
-  await Promise.all([
-    confirmation.then(async (dialog) => {
-      expect(dialog.message()).toBe(
-        "Excluir a meta “Criar reserva de emergência”?"
-      );
-      await dialog.accept();
-    }),
-    page
-      .getByRole("button", { name: "Excluir Criar reserva de emergência" })
-      .click()
-  ]);
+  await page
+    .getByRole("button", {
+      name: "Marcar Criar reserva de emergência como cumprida"
+    })
+    .click();
   expect(await hapticPatterns(page)).toEqual([10]);
+  await expect(page.getByText("Meta cumprida")).toBeVisible();
+  await expect(
+    page.getByRole("button", {
+      name: "Reabrir meta Criar reserva de emergência"
+    })
+  ).toBeVisible();
+
+  await page.reload();
+  await expect(page.getByText("Meta cumprida")).toBeVisible();
+  await page
+    .getByRole("button", {
+      name: "Reabrir meta Criar reserva de emergência"
+    })
+    .click();
+  expect(await hapticPatterns(page)).toEqual([10]);
+  await expect(
+    page.getByRole("button", {
+      name: "Marcar Criar reserva de emergência como cumprida"
+    })
+  ).toBeVisible();
+
+  await page
+    .getByRole("button", { name: "Excluir Criar reserva de emergência" })
+    .click();
+  await expect(
+    page.getByRole("heading", {
+      name: "Excluir a meta “Criar reserva de emergência”?"
+    })
+  ).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(
+    page.getByRole("heading", { name: "Criar reserva de emergência" })
+  ).toBeVisible();
+  expect(await hapticPatterns(page)).toEqual([10]);
+
+  await page
+    .getByRole("button", { name: "Excluir Criar reserva de emergência" })
+    .click();
+  await page.getByRole("button", { name: "Excluir meta" }).click();
+  expect(await hapticPatterns(page)).toEqual([10, 10]);
 
   await expect(
     page.getByRole("heading", { name: /uma meta clara transforma/i })

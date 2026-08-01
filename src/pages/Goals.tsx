@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { AppHeader } from "../components/AppHeader";
+import { DeleteConfirmationDialog } from "../components/DeleteConfirmationDialog";
 import { GoalDialog } from "../components/GoalDialog";
 import { GoalCard } from "../components/GoalCard";
 import { FileIcon, PlusIcon } from "../components/Icons";
@@ -9,9 +10,18 @@ import { AppLink } from "../navigation";
 import type { Goal } from "../types";
 
 export function Goals() {
-  const { goals, addGoal, updateGoal, deleteGoal, persistenceError } = useGoals();
+  const {
+    goals,
+    addGoal,
+    updateGoal,
+    deleteGoal,
+    completeGoal,
+    reopenGoal,
+    persistenceError
+  } = useGoals();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [goalBeingEdited, setGoalBeingEdited] = useState<Goal | null>(null);
+  const [goalBeingDeleted, setGoalBeingDeleted] = useState<Goal | null>(null);
 
   function createGoal() {
     setGoalBeingEdited(null);
@@ -32,6 +42,11 @@ export function Goals() {
     if (goalBeingEdited) updateGoal(goal);
     else addGoal(goal);
   }
+
+  const displayedGoals = [
+    ...goals.filter((goal) => !goal.completedAt),
+    ...goals.filter((goal) => goal.completedAt)
+  ];
 
   return (
     <div className="page-shell">
@@ -64,12 +79,14 @@ export function Goals() {
               <span>{goals.length} {goals.length === 1 ? "meta" : "metas"}</span>
             </div>
             <section className="goal-grid" aria-label="Metas cadastradas">
-              {goals.map((goal) => (
+              {displayedGoals.map((goal) => (
                 <GoalCard
                   key={goal.id}
                   goal={goal}
                   onEdit={() => editGoal(goal)}
-                  onDelete={() => deleteGoal(goal.id)}
+                  onDelete={() => setGoalBeingDeleted(goal)}
+                  onComplete={() => completeGoal(goal.id)}
+                  onReopen={() => reopenGoal(goal.id)}
                 />
               ))}
             </section>
@@ -92,6 +109,20 @@ export function Goals() {
         goal={goalBeingEdited}
         onClose={closeDialog}
         onSave={saveGoal}
+      />
+      <DeleteConfirmationDialog
+        open={goalBeingDeleted !== null}
+        title={
+          goalBeingDeleted
+            ? `Excluir a meta “${goalBeingDeleted.name}”?`
+            : "Excluir meta?"
+        }
+        description="Esta meta será removida definitivamente."
+        confirmLabel="Excluir meta"
+        onCancel={() => setGoalBeingDeleted(null)}
+        onConfirm={() => {
+          if (goalBeingDeleted) deleteGoal(goalBeingDeleted.id);
+        }}
       />
     </div>
   );

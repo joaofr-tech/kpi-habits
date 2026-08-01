@@ -78,7 +78,8 @@ export function GoalDialog({
       specification: specification.trim(),
       deadline,
       motivation: motivation.trim(),
-      createdAt: goal?.createdAt ?? today
+      createdAt: goal?.createdAt ?? today,
+      ...(goal?.completedAt ? { completedAt: goal.completedAt } : {})
     });
     triggerHapticFeedback();
     close();

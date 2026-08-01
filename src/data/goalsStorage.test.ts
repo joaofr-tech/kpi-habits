@@ -30,6 +30,21 @@ describe("persistência de metas", () => {
     expect(loadGoals()).toEqual([goal]);
   });
 
+  it("restaura uma conclusão válida e ignora uma data inválida", () => {
+    const completedGoal = { ...goal, completedAt: "2026-07-30" };
+    saveGoals([completedGoal]);
+    expect(loadGoals()).toEqual([completedGoal]);
+
+    localStorage.setItem(
+      "kpi-goals",
+      JSON.stringify({
+        version: 1,
+        goals: [{ ...goal, completedAt: "data-inválida" }]
+      })
+    );
+    expect(loadGoals()).toEqual([goal]);
+  });
+
   it("ignora JSON corrompido e versões desconhecidas", () => {
     localStorage.setItem("kpi-goals", "{");
     expect(loadGoals()).toEqual([]);

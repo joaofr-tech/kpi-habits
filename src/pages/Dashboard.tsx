@@ -2,6 +2,7 @@ import { useState } from "react";
 import { AppHeader } from "../components/AppHeader";
 import { AutomaticityDialog } from "../components/AutomaticityDialog";
 import { CreateHabitDialog } from "../components/CreateHabitDialog";
+import { DeleteConfirmationDialog } from "../components/DeleteConfirmationDialog";
 import { HabitCard } from "../components/HabitCard";
 import { FileIcon, PlusIcon } from "../components/Icons";
 import { StorageWarning } from "../components/StorageWarning";
@@ -21,6 +22,7 @@ export function Dashboard() {
   } = useHabits();
   const [creating, setCreating] = useState(false);
   const [testing, setTesting] = useState<Habit | null>(null);
+  const [deleting, setDeleting] = useState<Habit | null>(null);
 
   return (
     <div className="page-shell">
@@ -59,7 +61,7 @@ export function Dashboard() {
                   key={habit.id}
                   habit={habit}
                   onLog={(status) => setTodayLog(habit.id, status)}
-                  onDelete={() => deleteHabit(habit.id)}
+                  onDelete={() => setDeleting(habit)}
                   onTest={() => setTesting(habit)}
                 />
               ))}
@@ -88,6 +90,16 @@ export function Dashboard() {
         onClose={() => setTesting(null)}
         onConsolidate={consolidate}
         onExtend={extend}
+      />
+      <DeleteConfirmationDialog
+        open={deleting !== null}
+        title={deleting ? `Excluir “${deleting.name}”?` : "Excluir hábito?"}
+        description="Todo o histórico deste hábito será removido definitivamente."
+        confirmLabel="Excluir hábito"
+        onCancel={() => setDeleting(null)}
+        onConfirm={() => {
+          if (deleting) deleteHabit(deleting.id);
+        }}
       />
     </div>
   );

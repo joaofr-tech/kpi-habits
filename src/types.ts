@@ -52,6 +52,7 @@ export interface Goal {
   deadline: string;
   motivation: string;
   createdAt: string;
+  completedAt?: string;
 }
 
 export type FactorKey = keyof HabitFactors;
