@@ -1,21 +1,25 @@
 import { useEffect, useRef, useState } from "react";
 import { createId } from "../domain/id";
-import { toLocalDateKey } from "../domain/habits";
+import { toLocalDateKey } from "../domain/date";
 import type { Goal } from "../types";
+import { triggerHapticFeedback } from "../ui/haptics";
 import { CloseIcon } from "./Icons";
 
-interface CreateGoalDialogProps {
+interface GoalDialogProps {
   open: boolean;
+  goal: Goal | null;
   onClose: () => void;
   onSave: (goal: Goal) => void;
 }
 
-export function CreateGoalDialog({
+export function GoalDialog({
   open,
+  goal,
   onClose,
   onSave
-}: CreateGoalDialogProps) {
+}: GoalDialogProps) {
   const dialogRef = useRef<HTMLDialogElement>(null);
+  const bodyRef = useRef<HTMLDivElement>(null);
   const [name, setName] = useState("");
   const [specification, setSpecification] = useState("");
   const [deadline, setDeadline] = useState("");
@@ -25,9 +29,17 @@ export function CreateGoalDialog({
 
   useEffect(() => {
     const dialog = dialogRef.current;
+    if (open) {
+      setName(goal?.name ?? "");
+      setSpecification(goal?.specification ?? "");
+      setDeadline(goal?.deadline ?? "");
+      setMotivation(goal?.motivation ?? "");
+      setSubmitted(false);
+      if (bodyRef.current) bodyRef.current.scrollTop = 0;
+    }
     if (open && !dialog?.open) dialog?.showModal();
     if (!open && dialog?.open) dialog.close();
-  }, [open]);
+  }, [goal, open]);
 
   function reset() {
     setName("");
@@ -61,13 +73,14 @@ export function CreateGoalDialog({
       return;
     }
     onSave({
-      id: createId(),
+      id: goal?.id ?? createId(),
       name: name.trim(),
       specification: specification.trim(),
       deadline,
       motivation: motivation.trim(),
-      createdAt: today
+      createdAt: goal?.createdAt ?? today
     });
+    triggerHapticFeedback();
     close();
   }
 
@@ -75,7 +88,7 @@ export function CreateGoalDialog({
     <dialog
       ref={dialogRef}
       className="dialog"
-      aria-labelledby="create-goal-title"
+      aria-labelledby="goal-dialog-title"
       onCancel={(event) => {
         event.preventDefault();
         close();
@@ -89,15 +102,17 @@ export function CreateGoalDialog({
     >
       <div className="dialog-topline">
         <div>
-          <span className="eyebrow">Nova meta</span>
-          <h2 id="create-goal-title">Defina um resultado claro</h2>
+          <span className="eyebrow">{goal ? "Editar meta" : "Nova meta"}</span>
+          <h2 id="goal-dialog-title">
+            {goal ? "Atualize os detalhes" : "Defina um resultado claro"}
+          </h2>
         </div>
         <button className="icon-button" onClick={close} aria-label="Fechar">
           <CloseIcon />
         </button>
       </div>
 
-      <div className="dialog-body goal-form">
+      <div ref={bodyRef} className="dialog-body goal-form">
         <label className="field">
           <span>Nome</span>
           <input
@@ -175,7 +190,9 @@ export function CreateGoalDialog({
 
         <div className="dialog-actions">
           <button className="button-secondary" onClick={close}>Cancelar</button>
-          <button className="button-primary" onClick={save}>Criar meta</button>
+          <button className="button-primary" onClick={save}>
+            {goal ? "Salvar alterações" : "Criar meta"}
+          </button>
         </div>
       </div>
     </dialog>

@@ -58,10 +58,37 @@ describe("persistência", () => {
     ]);
   });
 
-  it("ignora JSON corrompido e versões desconhecidas", () => {
+  it("isola envelopes, hábitos e registros inválidos", () => {
     localStorage.setItem("kpi-habits", "{");
     expect(loadHabits()).toEqual([]);
+
     localStorage.setItem("kpi-habits", JSON.stringify({ version: 3, habits: [habit] }));
     expect(loadHabits()).toEqual([]);
+
+    const habitWithInvalidLogs = {
+      ...habit,
+      logs: [
+        { date: "data-inválida", status: "COMPLETED" },
+        { date: "2026-07-26", status: "COMPLETED" },
+        { date: "2026-07-26", status: "MISSED" }
+      ]
+    };
+    localStorage.setItem(
+      "kpi-habits",
+      JSON.stringify({
+        version: 2,
+        habits: [
+          { ...habit, schedule: { weekdays: ["FUNDAY"] } },
+          habitWithInvalidLogs
+        ]
+      })
+    );
+
+    expect(loadHabits()).toEqual([
+      {
+        ...habit,
+        logs: [{ date: "2026-07-26", status: "MISSED" }]
+      }
+    ]);
   });
 });

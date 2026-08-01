@@ -24,11 +24,32 @@ npm run dev
 ## Validar o projeto
 
 ```bash
+npm run check
+```
+
+O comando acima executa lint, testes unitários e build. O fluxo E2E deve ser
+executado separadamente porque depende dos navegadores do Playwright:
+
+```bash
 npm run lint
 npm run build
 npm test
 npm run test:e2e
 ```
+
+## Deploy
+
+A aplicação é publicada no Cloudflare Pages a partir da branch `main` do
+GitHub. A configuração do projeto no Pages deve usar:
+
+- Comando de build: `npm run check`;
+- Diretório de saída: `dist`;
+- Versão do Node.js: `22.16.0`;
+- Diretório raiz: `/`.
+
+O conteúdo salvo em `localStorage` pertence ao navegador e à origem atual. Por
+isso, dados criados em `localhost`, em URLs de preview ou em outro domínio não
+são transferidos para a URL de produção.
 
 ## Documentação
 

@@ -1,9 +1,12 @@
 import { expect, test } from "@playwright/test";
+import { hapticPatterns, installHapticProbe } from "./haptics";
+import { swipeUp } from "./touch";
 
 test("cria, persiste, registra e exclui um hábito", async ({
   page,
   isMobile
 }) => {
+  await installHapticProbe(page);
   await page.goto("/");
   expect(
     await page.evaluate(
@@ -30,7 +33,9 @@ test("cria, persiste, registra e exclui um hábito", async ({
   };
   await page.getByRole("button", { name: labels[weekday] }).click();
   await page.getByRole("button", { name: /configurar estimador/i }).click();
+  expect(await hapticPatterns(page)).toEqual([]);
   await page.getByRole("button", { name: /salvar hábito/i }).click();
+  expect(await hapticPatterns(page)).toEqual([10]);
 
   await expect(page.getByRole("heading", { name: "Caminhar" })).toBeVisible();
   await expect(page.getByText("por 20 minutos depois do almoço")).toBeVisible();
@@ -45,6 +50,7 @@ test("cria, persiste, registra e exclui um hábito", async ({
 
   await page.reload();
   await page.getByRole("button", { name: /^concluído/i }).click();
+  expect(await hapticPatterns(page)).toEqual([10]);
   await expect(
     isMobile
       ? page.getByText("100% consistência")
@@ -53,11 +59,8 @@ test("cria, persiste, registra e exclui um hábito", async ({
 
   page.on("dialog", (dialog) => dialog.accept());
   await page.getByRole("button", { name: /excluir caminhar/i }).click();
+  expect(await hapticPatterns(page)).toEqual([10, 10]);
   await expect(page.getByText(/seu primeiro hábito começa/i)).toBeVisible();
-});
-
-test("abre a metodologia e retorna ao painel", async ({ page }) => {
-  await page.goto("/");
   await page.getByRole("link", { name: /abrir metodologia/i }).click();
   await expect(page.getByRole("heading", { name: /repetir é construir/i })).toBeVisible();
   await page.getByRole("link", { name: /voltar ao painel/i }).click();
@@ -66,7 +69,9 @@ test("abre a metodologia e retorna ao painel", async ({ page }) => {
   ).toBeVisible();
 });
 
-test("conclui o cadastro em um celular compacto", async ({ page }) => {
+test("conclui o cadastro em um celular compacto", async ({ page, isMobile }) => {
+  test.skip(!isMobile, "cenário específico do projeto móvel");
+
   await page.addInitScript(() => {
     Object.defineProperty(Crypto.prototype, "randomUUID", {
       value: undefined,
@@ -86,8 +91,22 @@ test("conclui o cadastro em um celular compacto", async ({ page }) => {
   await expect(configure).toBeInViewport();
   await configure.click();
 
+  const estimator = page.locator(".dialog-body.estimator");
+  await expect.poll(() => estimator.evaluate((element) => element.scrollTop)).toBe(0);
+
+  for (const select of await estimator.locator("select").all()) {
+    await select.selectOption("HIGH");
+  }
+
+  await estimator.evaluate((element) => {
+    element.scrollTop = 0;
+  });
   const save = page.getByRole("button", { name: /salvar hábito/i });
-  await save.scrollIntoViewIfNeeded();
+  await expect(save).not.toBeInViewport();
+
+  await swipeUp(page, estimator);
+  await expect.poll(() => estimator.evaluate((element) => element.scrollTop)).toBeGreaterThan(0);
+  await swipeUp(page, estimator);
   await expect(save).toBeInViewport();
   await save.click();
 

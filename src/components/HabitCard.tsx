@@ -2,10 +2,11 @@ import {
   consistency,
   currentLog,
   isScheduledDate,
-  projectDays,
-  toLocalDateKey
+  projectDays
 } from "../domain/habits";
+import { toLocalDateKey } from "../domain/date";
 import type { Habit, HabitLogStatus } from "../types";
+import { triggerHapticFeedback } from "../ui/haptics";
 import { TrashIcon } from "./Icons";
 
 interface HabitCardProps {
@@ -31,7 +32,13 @@ export function HabitCard({
   function confirmDelete() {
     if (window.confirm(`Excluir “${habit.name}” e todo o seu histórico?`)) {
       onDelete();
+      triggerHapticFeedback();
     }
+  }
+
+  function logToday(status: HabitLogStatus | null) {
+    onLog(status);
+    triggerHapticFeedback();
   }
 
   return (
@@ -123,14 +130,16 @@ export function HabitCard({
             <button
               className={log === "COMPLETED" ? "active success" : ""}
               aria-pressed={log === "COMPLETED"}
-              onClick={() => onLog(log === "COMPLETED" ? null : "COMPLETED")}
+              onClick={() =>
+                logToday(log === "COMPLETED" ? null : "COMPLETED")
+              }
             >
               <span aria-hidden="true">✓</span> Concluído
             </button>
             <button
               className={log === "MISSED" ? "active missed" : ""}
               aria-pressed={log === "MISSED"}
-              onClick={() => onLog(log === "MISSED" ? null : "MISSED")}
+              onClick={() => logToday(log === "MISSED" ? null : "MISSED")}
             >
               <span aria-hidden="true">×</span> Não concluído
             </button>

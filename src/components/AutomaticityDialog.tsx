@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import type { Habit } from "../types";
+import { triggerHapticFeedback } from "../ui/haptics";
 import { CloseIcon } from "./Icons";
 
 const STATEMENTS = [
@@ -111,6 +112,7 @@ export function AutomaticityDialog({
                 className="button-secondary"
                 onClick={() => {
                   onExtend(habit.id);
+                  triggerHapticFeedback();
                   close();
                 }}
               >
@@ -121,6 +123,7 @@ export function AutomaticityDialog({
                 disabled={!approved}
                 onClick={() => {
                   onConsolidate(habit.id);
+                  triggerHapticFeedback();
                   close();
                 }}
               >

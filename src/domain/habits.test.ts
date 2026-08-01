@@ -3,9 +3,12 @@ import { FACTORS } from "../data/factors";
 import type { Habit, HabitFactors } from "../types";
 import {
   calculateTargetDays,
+  consolidateHabit,
   consistency,
+  extendHabit,
   opportunityDates,
   projectDays,
+  refreshAutomaticity,
   setLog
 } from "./habits";
 
@@ -32,13 +35,13 @@ const habit: Habit = {
 };
 
 describe("regras de hábitos", () => {
-  it("calcula o Dia-Alvo com os níveis médios e frequência diária", () => {
+  it("calcula o Dia-Alvo e rejeita frequências fora do contrato", () => {
     expect(calculateTargetDays(middle, 7)).toBe(76);
-  });
-
-  it("usa os novos multiplicadores e arredondamento da especificação", () => {
     expect(calculateTargetDays({ ...middle, complexity: "LOW" }, 7)).toBe(65);
     expect(calculateTargetDays({ ...middle, rewardAversion: "HIGH" }, 1)).toBe(231);
+    expect(() => calculateTargetDays(middle, 0)).toThrow(RangeError);
+    expect(() => calculateTargetDays(middle, 8)).toThrow(RangeError);
+    expect(() => calculateTargetDays(middle, 2.5)).toThrow(RangeError);
   });
 
   it("oferece exatamente três níveis para cada fator", () => {
@@ -57,15 +60,12 @@ describe("regras de hábitos", () => {
     expect(projectDays("2026-07-31", "2026-08-02")).toBe(3);
   });
 
-  it("gera somente oportunidades programadas até hoje", () => {
+  it("considera somente oportunidades programadas até hoje", () => {
     expect(opportunityDates(habit, "2026-07-26")).toEqual([
       "2026-07-20",
       "2026-07-22",
       "2026-07-24"
     ]);
-  });
-
-  it("exibe ausência de consistência sem oportunidades", () => {
     expect(
       consistency(
         { ...habit, createdAt: "2026-07-21" },
@@ -81,5 +81,25 @@ describe("regras de hábitos", () => {
     changed = setLog(changed, "2026-07-22", "COMPLETED");
     expect(changed.logs).toHaveLength(2);
     expect(consistency(changed, "2026-07-24")).toBe(67);
+  });
+
+  it("mantém as transições de automaticidade no domínio", () => {
+    const ready = refreshAutomaticity(
+      { ...habit, targetDays: 3 },
+      "2026-07-22"
+    );
+    expect(ready.automaticityStatus).toBe("READY_FOR_TEST");
+
+    const extended = extendHabit(ready);
+    expect(extended.targetDays).toBe(24);
+    expect(extended.automaticityStatus).toBe("EXTENDED");
+    expect(
+      refreshAutomaticity(extended, "2026-08-12").automaticityStatus
+    ).toBe("READY_FOR_TEST");
+
+    const consolidated = consolidateHabit(ready);
+    expect(
+      refreshAutomaticity(consolidated, "2026-08-12").automaticityStatus
+    ).toBe("CONSOLIDATED");
   });
 });

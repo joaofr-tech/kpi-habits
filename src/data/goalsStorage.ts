@@ -1,14 +1,7 @@
 import type { Goal } from '../types';
+import { isLocalDateKey } from '../domain/date';
 
 const STORAGE_KEY = 'kpi-goals';
-
-function isValidDateKey(value: unknown): value is string {
-  if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(value)) {
-    return false;
-  }
-  const date = new Date(`${value}T00:00:00Z`);
-  return !Number.isNaN(date.getTime()) && date.toISOString().slice(0, 10) === value;
-}
 
 function normalizeText(value: unknown, maxLength: number): string | null {
   if (typeof value !== 'string') return null;
@@ -31,8 +24,8 @@ function normalizeGoal(value: unknown): Goal | null {
     !name ||
     !specification ||
     !motivation ||
-    !isValidDateKey(goal.deadline) ||
-    !isValidDateKey(goal.createdAt)
+    !isLocalDateKey(goal.deadline) ||
+    !isLocalDateKey(goal.createdAt)
   ) {
     return null;
   }
@@ -68,6 +61,11 @@ export function loadGoals(): Goal[] {
   }
 }
 
-export function saveGoals(goals: Goal[]): void {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify({ version: 1, goals }));
+export function saveGoals(goals: Goal[]): boolean {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ version: 1, goals }));
+    return true;
+  } catch {
+    return false;
+  }
 }

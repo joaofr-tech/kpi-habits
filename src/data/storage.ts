@@ -1,51 +1,160 @@
-import type { Habit } from "../types";
+import { isLocalDateKey } from "../domain/date";
+import type {
+  Habit,
+  HabitFactors,
+  HabitFactorLevel,
+  HabitLog,
+  HabitLogStatus,
+  Weekday
+} from "../types";
 
 const STORAGE_KEY = "kpi-habits";
 
-type LegacyFactorLevel =
-  | "VERY_LOW"
-  | "LOW"
-  | "MEDIUM"
-  | "HIGH"
-  | "VERY_HIGH";
+const WEEKDAYS = new Set<Weekday>([
+  "MONDAY",
+  "TUESDAY",
+  "WEDNESDAY",
+  "THURSDAY",
+  "FRIDAY",
+  "SATURDAY",
+  "SUNDAY"
+]);
+const LOG_STATUSES = new Set<HabitLogStatus>(["COMPLETED", "MISSED"]);
+const AUTOMATICITY_STATUSES = new Set<Habit["automaticityStatus"]>([
+  "TRACKING",
+  "READY_FOR_TEST",
+  "CONSOLIDATED",
+  "EXTENDED"
+]);
 
-function normalizeLevel(value: unknown): "LOW" | "MEDIUM" | "HIGH" {
-  if (value === "VERY_LOW" || value === "LOW") return "LOW";
-  if (value === "VERY_HIGH" || value === "HIGH") return "HIGH";
-  return "MEDIUM";
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return Boolean(value) && typeof value === "object" && !Array.isArray(value);
 }
 
-function normalizeHabit(value: unknown): Habit | null {
-  if (!value || typeof value !== "object") return null;
-  const habit = value as Partial<Habit> & {
-    factors?: Record<string, LegacyFactorLevel>;
-  };
+function normalizeLevel(value: unknown): HabitFactorLevel | null {
+  if (value === "VERY_LOW" || value === "LOW") return "LOW";
+  if (value === "VERY_HIGH" || value === "HIGH") return "HIGH";
+  if (value === "MEDIUM") return "MEDIUM";
+  return null;
+}
+
+function normalizeFactors(value: unknown): HabitFactors | null {
+  if (!isRecord(value)) return null;
+
+  const complexity = normalizeLevel(value.complexity);
+  const friction = normalizeLevel(value.friction);
+  const contextStability = normalizeLevel(value.contextStability);
+  const competingHabit = normalizeLevel(value.competingHabit);
+  const rewardAversion = normalizeLevel(value.rewardAversion);
   if (
-    typeof habit.id !== "string" ||
-    typeof habit.name !== "string" ||
-    typeof habit.createdAt !== "string" ||
-    typeof habit.targetDays !== "number" ||
-    !habit.factors ||
-    !habit.schedule ||
-    !Array.isArray(habit.schedule.weekdays) ||
-    !Array.isArray(habit.logs) ||
-    typeof habit.automaticityStatus !== "string"
+    !complexity ||
+    !friction ||
+    !contextStability ||
+    !competingHabit ||
+    !rewardAversion
   ) {
     return null;
   }
+
   return {
-    ...habit,
-    details: typeof habit.details === "string" ? habit.details : "",
-    factors: {
-      complexity: normalizeLevel(habit.factors.complexity),
-      friction: normalizeLevel(habit.factors.friction),
-      contextStability: normalizeLevel(habit.factors.contextStability),
-      competingHabit: normalizeLevel(habit.factors.competingHabit),
-      rewardAversion: normalizeLevel(habit.factors.rewardAversion)
-    },
-    schedule: { weekdays: habit.schedule.weekdays },
-    logs: habit.logs
-  } as Habit;
+    complexity,
+    friction,
+    contextStability,
+    competingHabit,
+    rewardAversion
+  };
+}
+
+function normalizeWeekdays(value: unknown): Weekday[] | null {
+  if (!Array.isArray(value) || value.length === 0) return null;
+  if (!value.every((day): day is Weekday => WEEKDAYS.has(day as Weekday))) {
+    return null;
+  }
+  return [...new Set(value)];
+}
+
+function normalizeLogs(value: unknown, createdAt: string): HabitLog[] | null {
+  if (!Array.isArray(value)) return null;
+
+  const logsByDate = new Map<string, HabitLog>();
+  for (const item of value) {
+    if (
+      !isRecord(item) ||
+      !isLocalDateKey(item.date) ||
+      item.date < createdAt ||
+      !LOG_STATUSES.has(item.status as HabitLogStatus)
+    ) {
+      continue;
+    }
+    logsByDate.set(item.date, {
+      date: item.date,
+      status: item.status as HabitLogStatus
+    });
+  }
+
+  return [...logsByDate.values()].sort((a, b) =>
+    a.date.localeCompare(b.date)
+  );
+}
+
+function normalizeHabit(value: unknown): Habit | null {
+  if (!isRecord(value)) return null;
+  const factors = normalizeFactors(value.factors);
+  const schedule = isRecord(value.schedule)
+    ? normalizeWeekdays(value.schedule.weekdays)
+    : null;
+  const logs = isLocalDateKey(value.createdAt)
+    ? normalizeLogs(value.logs, value.createdAt)
+    : null;
+  const name = typeof value.name === "string" ? value.name.trim() : "";
+  const details =
+    value.details === undefined
+      ? ""
+      : typeof value.details === "string"
+        ? value.details.trim()
+        : null;
+
+  if (
+    typeof value.id !== "string" ||
+    value.id.trim().length === 0 ||
+    name.length === 0 ||
+    name.length > 80 ||
+    details === null ||
+    details.length > 160 ||
+    !isLocalDateKey(value.createdAt) ||
+    typeof value.targetDays !== "number" ||
+    !Number.isInteger(value.targetDays) ||
+    value.targetDays < 1 ||
+    !factors ||
+    !schedule ||
+    !logs ||
+    !AUTOMATICITY_STATUSES.has(
+      value.automaticityStatus as Habit["automaticityStatus"]
+    )
+  ) {
+    return null;
+  }
+
+  const minimumVersion =
+    typeof value.minimumVersion === "string"
+      ? value.minimumVersion.trim()
+      : "";
+
+  return {
+    id: value.id,
+    name,
+    details,
+    createdAt: value.createdAt,
+    targetDays: value.targetDays,
+    factors,
+    schedule: { weekdays: schedule },
+    ...(minimumVersion.length > 0 && minimumVersion.length <= 160
+      ? { minimumVersion }
+      : {}),
+    logs,
+    automaticityStatus:
+      value.automaticityStatus as Habit["automaticityStatus"]
+  };
 }
 
 export function loadHabits(): Habit[] {
@@ -69,6 +178,11 @@ export function loadHabits(): Habit[] {
   }
 }
 
-export function saveHabits(habits: Habit[]): void {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify({ version: 2, habits }));
+export function saveHabits(habits: Habit[]): boolean {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ version: 2, habits }));
+    return true;
+  } catch {
+    return false;
+  }
 }

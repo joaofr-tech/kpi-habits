@@ -3,17 +3,28 @@ import { GoalsProvider } from "./context/GoalsContext";
 import { Dashboard } from "./pages/Dashboard";
 import { Goals } from "./pages/Goals";
 import { Methodology } from "./pages/Methodology";
+import { NotFound } from "./pages/NotFound";
 
 export default function App() {
-  const page = window.location.pathname === "/metodologia"
-    ? <Methodology />
-    : window.location.pathname === "/metas"
-      ? <Goals />
-      : <Dashboard />;
+  if (window.location.pathname === "/metodologia") {
+    return <Methodology />;
+  }
 
-  return (
-    <HabitsProvider>
-      <GoalsProvider>{page}</GoalsProvider>
-    </HabitsProvider>
-  );
+  if (window.location.pathname === "/metas") {
+    return (
+      <GoalsProvider>
+        <Goals />
+      </GoalsProvider>
+    );
+  }
+
+  if (window.location.pathname === "/") {
+    return (
+      <HabitsProvider>
+        <Dashboard />
+      </HabitsProvider>
+    );
+  }
+
+  return <NotFound />;
 }

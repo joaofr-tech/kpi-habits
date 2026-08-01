@@ -1,42 +1,30 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { HabitsProvider } from "../context/HabitsContext";
 import { Dashboard } from "./Dashboard";
 
-vi.stubGlobal("crypto", { randomUUID: () => "new-habit" });
-
 describe("painel", () => {
   beforeEach(() => localStorage.clear());
+  afterEach(() => vi.restoreAllMocks());
 
-  it("cria um hábito pelo fluxo completo", async () => {
-    const user = userEvent.setup();
+  it("avisa quando os hábitos não podem ser persistidos", async () => {
+    vi.spyOn(Storage.prototype, "setItem").mockImplementation(() => {
+      throw new DOMException("Quota excedida", "QuotaExceededError");
+    });
+
     render(
       <HabitsProvider>
         <Dashboard />
       </HabitsProvider>
     );
 
-    await user.click(screen.getByRole("button", { name: /criar primeiro hábito/i }));
-    await user.type(
-      screen.getByLabelText(/qual hábito você quer construir/i),
-      "Caminhar"
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      /não foi possível salvar neste navegador/i
     );
-    await user.type(
-      screen.getByLabelText(/detalhe do hábito/i),
-      "por 20 minutos depois do almoço"
-    );
-    await user.click(screen.getByRole("button", { name: "Domingo" }));
-    await user.click(screen.getByRole("button", { name: "Segunda-feira" }));
-    await user.click(screen.getByRole("button", { name: "Terça-feira" }));
-    await user.click(screen.getByRole("button", { name: /configurar estimador/i }));
-    await user.click(screen.getByRole("button", { name: /salvar hábito/i }));
-
-    expect(screen.getByRole("heading", { name: "Caminhar" })).toBeInTheDocument();
     expect(
-      screen.getByText("por 20 minutos depois do almoço")
+      screen.getByRole("heading", { name: /seu primeiro hábito começa/i })
     ).toBeInTheDocument();
-    expect(localStorage.getItem("kpi-habits")).toContain("Caminhar");
   });
 
   it("exige detalhe e pelo menos um dia sem pedir frequência separada", async () => {

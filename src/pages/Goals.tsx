@@ -1,21 +1,45 @@
 import { useState } from "react";
 import { AppHeader } from "../components/AppHeader";
-import { CreateGoalDialog } from "../components/CreateGoalDialog";
+import { GoalDialog } from "../components/GoalDialog";
 import { GoalCard } from "../components/GoalCard";
 import { FileIcon, PlusIcon } from "../components/Icons";
+import { StorageWarning } from "../components/StorageWarning";
 import { useGoals } from "../context/GoalsContext";
+import type { Goal } from "../types";
 
 export function Goals() {
-  const { goals, addGoal } = useGoals();
-  const [creating, setCreating] = useState(false);
+  const { goals, addGoal, updateGoal, deleteGoal, persistenceError } = useGoals();
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [goalBeingEdited, setGoalBeingEdited] = useState<Goal | null>(null);
+
+  function createGoal() {
+    setGoalBeingEdited(null);
+    setDialogOpen(true);
+  }
+
+  function editGoal(goal: Goal) {
+    setGoalBeingEdited(goal);
+    setDialogOpen(true);
+  }
+
+  function closeDialog() {
+    setDialogOpen(false);
+    setGoalBeingEdited(null);
+  }
+
+  function saveGoal(goal: Goal) {
+    if (goalBeingEdited) updateGoal(goal);
+    else addGoal(goal);
+  }
 
   return (
     <div className="page-shell">
       <AppHeader
         activeSection="goals"
         addLabel="Nova meta"
-        onAdd={() => setCreating(true)}
+        onAdd={createGoal}
       />
+      <StorageWarning visible={persistenceError} />
       <main className="dashboard">
         {goals.length === 0 ? (
           <section className="empty-state">
@@ -27,7 +51,7 @@ export function Goals() {
                 Registre o resultado que você busca, determine uma data-limite
                 e lembre por que ele importa.
               </p>
-              <button className="button-primary" onClick={() => setCreating(true)}>
+              <button className="button-primary" onClick={createGoal}>
                 <PlusIcon /> Criar primeira meta
               </button>
             </div>
@@ -39,14 +63,21 @@ export function Goals() {
               <span>{goals.length} {goals.length === 1 ? "meta" : "metas"}</span>
             </div>
             <section className="goal-grid" aria-label="Metas cadastradas">
-              {goals.map((goal) => <GoalCard key={goal.id} goal={goal} />)}
+              {goals.map((goal) => (
+                <GoalCard
+                  key={goal.id}
+                  goal={goal}
+                  onEdit={() => editGoal(goal)}
+                  onDelete={() => deleteGoal(goal.id)}
+                />
+              ))}
             </section>
           </>
         )}
       </main>
       <footer className="app-footer">
-        <p>Eu sou o melhor</p>
-        <span>um dia de cada vez</span>
+        <p>Believe it first.</p>
+        <span></span>
       </footer>
       <a
         className="method-button"
@@ -55,10 +86,11 @@ export function Goals() {
       >
         <FileIcon />
       </a>
-      <CreateGoalDialog
-        open={creating}
-        onClose={() => setCreating(false)}
-        onSave={addGoal}
+      <GoalDialog
+        open={dialogOpen}
+        goal={goalBeingEdited}
+        onClose={closeDialog}
+        onSave={saveGoal}
       />
     </div>
   );

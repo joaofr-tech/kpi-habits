@@ -4,12 +4,14 @@ import { AutomaticityDialog } from "../components/AutomaticityDialog";
 import { CreateHabitDialog } from "../components/CreateHabitDialog";
 import { HabitCard } from "../components/HabitCard";
 import { FileIcon, PlusIcon } from "../components/Icons";
+import { StorageWarning } from "../components/StorageWarning";
 import { useHabits } from "../context/HabitsContext";
 import type { Habit } from "../types";
 
 export function Dashboard() {
   const {
     habits,
+    persistenceError,
     addHabit,
     deleteHabit,
     setTodayLog,
@@ -26,6 +28,7 @@ export function Dashboard() {
         addLabel="Novo hábito"
         onAdd={() => setCreating(true)}
       />
+      <StorageWarning visible={persistenceError} />
       <main className="dashboard">
         {habits.length === 0 ? (
           <section className="empty-state">
@@ -64,8 +67,8 @@ export function Dashboard() {
         )}
       </main>
       <footer className="app-footer">
-        <p>Eu sou o melhor</p>
-        <span>um dia de cada vez</span>
+        <p>Eu não quero, mas tenho que fazer.</p>
+        <span>Então, que importa o que eu quero?</span>
       </footer>
       <a
         className="method-button"

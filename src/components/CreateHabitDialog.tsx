@@ -1,8 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import { FACTORS, WEEKDAYS } from "../data/factors";
-import { calculateTargetDays, toLocalDateKey } from "../domain/habits";
+import { toLocalDateKey } from "../domain/date";
+import { calculateTargetDays } from "../domain/habits";
 import { createId } from "../domain/id";
 import type { Habit, HabitFactors, HabitFactorLevel, Weekday } from "../types";
+import { triggerHapticFeedback } from "../ui/haptics";
 import { CloseIcon } from "./Icons";
 
 interface CreateHabitDialogProps {
@@ -86,6 +88,7 @@ export function CreateHabitDialog({
       logs: [],
       automaticityStatus: "TRACKING"
     });
+    triggerHapticFeedback();
     close();
   }
 
@@ -118,7 +121,7 @@ export function CreateHabitDialog({
       </div>
 
       {step === 1 ? (
-        <div className="dialog-body">
+        <div className="dialog-body" key="habit-details">
           <label className="field">
             <span>Qual hábito você quer construir?</span>
             <input
@@ -214,7 +217,7 @@ export function CreateHabitDialog({
           </div>
         </div>
       ) : (
-        <div className="dialog-body estimator">
+        <div className="dialog-body estimator" key="habit-estimator">
           <p className="dialog-intro">
             Escolha a descrição mais próxima da sua realidade. Os valores são
             calculados automaticamente.

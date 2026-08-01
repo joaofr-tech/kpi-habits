@@ -2,13 +2,19 @@ import {
   createContext,
   type PropsWithChildren,
   useContext,
-  useEffect,
   useMemo,
   useReducer
 } from "react";
 import { loadHabits, saveHabits } from "../data/storage";
-import { refreshAutomaticity, setLog, toLocalDateKey } from "../domain/habits";
+import { toLocalDateKey } from "../domain/date";
+import {
+  consolidateHabit,
+  extendHabit,
+  refreshAutomaticity,
+  setLog
+} from "../domain/habits";
 import type { Habit, HabitLogStatus } from "../types";
+import { usePersistenceError } from "./usePersistenceError";
 
 type Action =
   | { type: "add"; habit: Habit }
@@ -32,17 +38,13 @@ function reducer(habits: Habit[], action: Action): Habit[] {
     case "consolidate":
       return habits.map((habit) =>
         habit.id === action.id
-          ? { ...habit, automaticityStatus: "CONSOLIDATED" }
+          ? consolidateHabit(habit)
           : habit
       );
     case "extend":
       return habits.map((habit) =>
         habit.id === action.id
-          ? {
-              ...habit,
-              targetDays: habit.targetDays + 21,
-              automaticityStatus: "EXTENDED"
-            }
+          ? extendHabit(habit)
           : habit
       );
   }
@@ -50,6 +52,7 @@ function reducer(habits: Habit[], action: Action): Habit[] {
 
 interface HabitsContextValue {
   habits: Habit[];
+  persistenceError: boolean;
   addHabit: (habit: Habit) => void;
   deleteHabit: (id: string) => void;
   setTodayLog: (id: string, status: HabitLogStatus | null) => void;
@@ -66,20 +69,19 @@ export function HabitsProvider({ children }: PropsWithChildren) {
     () => loadHabits().map((habit) => refreshAutomaticity(habit))
   );
 
-  useEffect(() => {
-    saveHabits(habits);
-  }, [habits]);
+  const persistenceError = usePersistenceError(saveHabits, habits);
 
   const value = useMemo<HabitsContextValue>(
     () => ({
       habits,
+      persistenceError,
       addHabit: (habit) => dispatch({ type: "add", habit }),
       deleteHabit: (id) => dispatch({ type: "delete", id }),
       setTodayLog: (id, status) => dispatch({ type: "log", id, status }),
       consolidate: (id) => dispatch({ type: "consolidate", id }),
       extend: (id) => dispatch({ type: "extend", id })
     }),
-    [habits]
+    [habits, persistenceError]
   );
 
   return (

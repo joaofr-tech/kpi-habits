@@ -1,12 +1,19 @@
-import { FACTORS } from "../data/factors";
 import type {
+  FactorKey,
   Habit,
+  HabitFactorLevel,
   HabitFactors,
   HabitLogStatus,
   Weekday
 } from "../types";
+import {
+  dateKeyToUtcTime,
+  parseLocalDate,
+  toLocalDateKey
+} from "./date";
 
 const DAY_MS = 86_400_000;
+const AUTOMATICITY_EXTENSION_DAYS = 21;
 const WEEKDAY_BY_INDEX: Weekday[] = [
   "SUNDAY",
   "MONDAY",
@@ -17,37 +24,50 @@ const WEEKDAY_BY_INDEX: Weekday[] = [
   "SATURDAY"
 ];
 
-export function toLocalDateKey(date = new Date()): string {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-  return `${year}-${month}-${day}`;
-}
+const FACTOR_KEYS: FactorKey[] = [
+  "complexity",
+  "friction",
+  "contextStability",
+  "competingHabit",
+  "rewardAversion"
+];
 
-export function parseLocalDate(key: string): Date {
-  const [year, month, day] = key.split("-").map(Number);
-  return new Date(year, month - 1, day);
-}
-
-function utcDay(key: string): number {
-  const [year, month, day] = key.split("-").map(Number);
-  return Date.UTC(year, month - 1, day);
-}
+const FACTOR_MULTIPLIERS: Record<
+  FactorKey,
+  Record<HabitFactorLevel, number>
+> = {
+  complexity: { LOW: 0.85, MEDIUM: 1, HIGH: 1.25 },
+  friction: { LOW: 0.9, MEDIUM: 1, HIGH: 1.2 },
+  contextStability: { LOW: 0.88, MEDIUM: 1, HIGH: 1.2 },
+  competingHabit: { LOW: 0.9, MEDIUM: 1.15, HIGH: 1.35 },
+  rewardAversion: { LOW: 0.92, MEDIUM: 1, HIGH: 1.15 }
+};
 
 export function projectDays(createdAt: string, today = toLocalDateKey()): number {
-  return Math.max(1, Math.floor((utcDay(today) - utcDay(createdAt)) / DAY_MS) + 1);
+  return Math.max(
+    1,
+    Math.floor(
+      (dateKeyToUtcTime(today) - dateKeyToUtcTime(createdAt)) / DAY_MS
+    ) + 1
+  );
 }
 
 export function calculateTargetDays(
   factors: HabitFactors,
   frequencyPerWeek: number
 ): number {
-  const multiplier = FACTORS.reduce((total, factor) => {
-    const selected = factor.options.find(
-      (option) => option.level === factors[factor.key]
-    );
-    if (!selected) throw new Error(`Fator inválido: ${factor.key}`);
-    return total * selected.value;
+  if (
+    !Number.isInteger(frequencyPerWeek) ||
+    frequencyPerWeek < 1 ||
+    frequencyPerWeek > 7
+  ) {
+    throw new RangeError("A frequência semanal deve ser um inteiro entre 1 e 7");
+  }
+
+  const multiplier = FACTOR_KEYS.reduce((total, key) => {
+    const selected = FACTOR_MULTIPLIERS[key][factors[key]];
+    if (selected === undefined) throw new Error(`Fator inválido: ${key}`);
+    return total * selected;
   }, 1);
   return Math.round(66 * multiplier * Math.sqrt(7 / frequencyPerWeek));
 }
@@ -61,11 +81,11 @@ export function opportunityDates(
   habit: Habit,
   today = toLocalDateKey()
 ): string[] {
-  const end = utcDay(today);
+  const end = dateKeyToUtcTime(today);
   const dates: string[] = [];
   for (
     let cursor = parseLocalDate(habit.createdAt);
-    utcDay(toLocalDateKey(cursor)) <= end;
+    dateKeyToUtcTime(toLocalDateKey(cursor)) <= end;
     cursor.setDate(cursor.getDate() + 1)
   ) {
     const key = toLocalDateKey(cursor);
@@ -112,4 +132,16 @@ export function refreshAutomaticity(
     return { ...habit, automaticityStatus: "READY_FOR_TEST" };
   }
   return habit;
+}
+
+export function consolidateHabit(habit: Habit): Habit {
+  return { ...habit, automaticityStatus: "CONSOLIDATED" };
+}
+
+export function extendHabit(habit: Habit): Habit {
+  return {
+    ...habit,
+    targetDays: habit.targetDays + AUTOMATICITY_EXTENSION_DAYS,
+    automaticityStatus: "EXTENDED"
+  };
 }

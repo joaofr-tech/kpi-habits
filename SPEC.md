@@ -38,7 +38,7 @@ A primeira versão deve permitir:
 8. Excluir um hábito;
 9. Persistir os dados localmente;
 10. Abrir uma página explicando a metodologia;
-11. Criar e visualizar metas pessoais simples.
+11. Criar, visualizar, editar e excluir metas pessoais simples.
 
 ---
 
@@ -55,7 +55,7 @@ Não fazem parte desta versão:
 - Gamificação além do acompanhamento visual;
 - Categorias;
 - Planejamento anual e ciclos de metas;
-- Progresso quantitativo, conclusão, edição ou gestão avançada de metas;
+- Progresso quantitativo, conclusão ou gestão avançada de metas;
 - Aplicação nativa;
 - Inteligência artificial;
 - Recomendações personalizadas automáticas.
@@ -318,7 +318,27 @@ Cada card deve exibir:
 
 Dados ausentes, inválidos ou pertencentes a uma versão desconhecida não devem quebrar a aplicação.
 
-Nesta versão, metas não possuem edição, exclusão, conclusão, progresso quantitativo nem vínculo com hábitos.
+Nesta versão, metas não possuem conclusão, progresso quantitativo nem vínculo com hábitos.
+
+---
+
+## RF16 — Editar meta
+
+Cada card de meta deve possuir uma ação de edição. Ao acioná-la, o formulário deve
+ser aberto com os dados atuais da meta e aplicar as mesmas validações da criação.
+
+Ao salvar, a meta deve ser atualizada imediatamente e persistida sem alterar seu
+identificador, sua data de criação ou sua posição na lista.
+
+---
+
+## RF17 — Excluir meta
+
+Cada card de meta deve possuir uma ação de exclusão. Antes de excluir, a aplicação
+deve solicitar uma confirmação clara ao usuário.
+
+Ao confirmar, a meta deve ser removida imediatamente e a exclusão deve ser
+persistida no armazenamento local.
 
 ---
 
@@ -659,6 +679,23 @@ Os modais devem:
 - Permitir alcançar todas as ações em telas de pelo menos 360 × 640 px;
 - Respeitar a área segura inferior em dispositivos móveis;
 - Exibir mensagens de validação próximas aos campos.
+
+---
+
+## 8.9 Feedback de interação
+
+Todos os botões habilitados devem apresentar uma resposta visual curta enquanto
+estiverem pressionados. O efeito deve respeitar a preferência de redução de
+movimento do sistema.
+
+Quando a API de vibração estiver disponível, ações importantes concluídas devem
+emitir um único pulso tátil discreto. São ações importantes: salvar hábitos ou
+metas, registrar a execução diária, excluir após confirmação, estender o
+acompanhamento e consolidar um hábito.
+
+A ausência ou falha da API não deve impedir a ação principal. Abrir, fechar ou
+cancelar modais, navegar, selecionar campos e falhar em validações não devem
+emitir vibração. Esta versão não possui feedback sonoro.
 
 ---
 
