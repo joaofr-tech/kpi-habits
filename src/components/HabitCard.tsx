@@ -1,4 +1,6 @@
+import { useState } from "react";
 import {
+  completedExecutions,
   consistency,
   currentLog,
   isScheduledDate,
@@ -6,7 +8,7 @@ import {
 } from "../domain/habits";
 import { toLocalDateKey } from "../domain/date";
 import type { Habit, HabitLogStatus } from "../types";
-import { triggerHapticFeedback } from "../ui/haptics";
+import { playCompletionSound } from "../ui/completionFeedback";
 import { TrashIcon } from "./Icons";
 
 interface HabitCardProps {
@@ -25,13 +27,24 @@ export function HabitCard({
   const today = toLocalDateKey();
   const days = projectDays(habit.createdAt, today);
   const rate = consistency(habit, today);
+  const completed = completedExecutions(habit, today);
   const log = currentLog(habit, today);
   const scheduled = isScheduledDate(habit, today);
   const progress = Math.min(100, Math.round((days / habit.targetDays) * 100));
+  const [celebrating, setCelebrating] = useState(false);
+  const [announcement, setAnnouncement] = useState("");
 
   function logToday(status: HabitLogStatus | null) {
+    if (status === "COMPLETED" && log !== "COMPLETED") {
+      playCompletionSound();
+      setCelebrating(true);
+      setAnnouncement(
+        `${habit.name}: ${completed + 1} ${completed === 0 ? "execução feita" : "execuções feitas"}`
+      );
+    } else if (log === "COMPLETED") {
+      setAnnouncement(`${habit.name}: ${Math.max(0, completed - 1)} execuções feitas`);
+    }
     onLog(status);
-    triggerHapticFeedback();
   }
 
   return (
@@ -63,7 +76,6 @@ export function HabitCard({
       </div>
       <div className="mobile-card-summary">
         <strong>Dia {days} de {habit.targetDays}</strong>
-        <span>{rate === null ? "—" : `${rate}% consistência`}</span>
       </div>
       <div
         className="progress-track"
@@ -76,6 +88,13 @@ export function HabitCard({
         <span style={{ width: `${progress}%` }} />
       </div>
 
+      <div className="progress-stats">
+        <strong className={celebrating ? "completed-count celebrate" : "completed-count"}>
+          {completed} {completed === 1 ? "execução feita" : "execuções feitas"}
+        </strong>
+        <span>{rate === null ? "— consistência" : `${rate}% consistência`}</span>
+      </div>
+
       <div className="metric-row">
         <div>
           <span>Consistência</span>
@@ -86,16 +105,8 @@ export function HabitCard({
           <strong>{habit.targetDays}</strong>
         </div>
         <div>
-          <span>Hoje</span>
-          <strong>
-            {!scheduled
-              ? "Pausa"
-              : log === "COMPLETED"
-                ? "Feito"
-                : log === "MISSED"
-                  ? "Não feito"
-                  : "Pendente"}
-          </strong>
+          <span>Execuções</span>
+          <strong>{completed}</strong>
         </div>
       </div>
 
@@ -121,26 +132,35 @@ export function HabitCard({
         {scheduled ? (
           <div className="log-controls">
             <button
-              className={log === "COMPLETED" ? "active success" : ""}
-              aria-pressed={log === "COMPLETED"}
-              onClick={() =>
-                logToday(log === "COMPLETED" ? null : "COMPLETED")
-              }
-            >
-              <span aria-hidden="true">✓</span> Concluído
-            </button>
-            <button
               className={log === "MISSED" ? "active missed" : ""}
               aria-pressed={log === "MISSED"}
               onClick={() => logToday(log === "MISSED" ? null : "MISSED")}
             >
               <span aria-hidden="true">×</span> Não concluído
             </button>
+            <button
+              className={`completed-control${log === "COMPLETED" ? " active success" : ""}${celebrating ? " celebrate" : ""}`}
+              aria-pressed={log === "COMPLETED"}
+              onAnimationEnd={(event) => {
+                if (event.animationName === "completion-button-pop") {
+                  setCelebrating(false);
+                }
+              }}
+              onClick={() =>
+                logToday(log === "COMPLETED" ? null : "COMPLETED")
+              }
+            >
+              <span className="completion-check" aria-hidden="true">✓</span>
+              Concluído
+            </button>
           </div>
         ) : (
           <p className="rest-day">Hoje não é um dia programado. Descanse sem culpa.</p>
         )}
       </div>
+      <p className="sr-only" aria-live="polite" aria-atomic="true">
+        {announcement}
+      </p>
     </article>
   );
 }

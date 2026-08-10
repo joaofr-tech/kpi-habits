@@ -1,5 +1,3 @@
-@import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap");
-
 :root {
   font-family: "DM Sans", sans-serif;
   color: #151515;
@@ -17,7 +15,7 @@
 
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
-body { margin: 0; min-width: 320px; min-height: 100vh; }
+body { margin: 0; min-width: 320px; min-height: 100vh; min-height: 100dvh; }
 button, input, select, textarea { font: inherit; }
 button, a { -webkit-tap-highlight-color: transparent; }
 button {
@@ -33,8 +31,26 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
   outline-offset: 3px;
 }
 a { color: inherit; }
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
 
-.page-shell { min-height: 100vh; display: flex; flex-direction: column; }
+.page-shell {
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+  display: flex;
+  flex-direction: column;
+}
 .app-header {
   width: min(1180px, calc(100% - 48px));
   height: 96px;
@@ -191,6 +207,18 @@ a { color: inherit; }
 .mobile-card-summary { display: none; }
 .progress-track { height: 6px; margin-top: 9px; overflow: hidden; background: #e9e6df; border-radius: 9px; }
 .progress-track span { display: block; height: 100%; background: var(--ink); border-radius: inherit; }
+.progress-stats {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 10px;
+  font-size: 12px;
+}
+.progress-stats span { color: var(--muted); text-align: right; }
+.completed-count.celebrate {
+  animation: completion-count-pop 500ms cubic-bezier(.2, 1.45, .4, 1);
+}
 .metric-row {
   display: grid; grid-template-columns: repeat(3, 1fr);
   padding: 15px 0;
@@ -203,15 +231,74 @@ a { color: inherit; }
 .metric-row strong { display: block; margin-top: 4px; font: 700 16px "Manrope"; }
 .today-section { margin-top: 14px; }
 .today-label { display: block; margin-bottom: 7px; font-size: 10px; font-weight: 700; }
-.log-controls { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
+.log-controls {
+  display: grid;
+  grid-template-columns: 1fr 1.3fr;
+  gap: 9px;
+  align-items: center;
+}
 .log-controls button {
-  min-height: 44px; padding: 0 8px;
-  border: 1px solid var(--line); border-radius: 10px; background: white; font-size: 12px; font-weight: 700; cursor: pointer;
+  min-height: 48px; padding: 0 8px;
+  border: 1px solid var(--line); border-radius: 14px; background: white; font-size: 12px; font-weight: 700; cursor: pointer;
 }
 .log-controls button:hover { background: #f6f4ef; }
-.log-controls .active.success { background: var(--green); border-color: #9bdb52; }
+.log-controls .completed-control {
+  position: relative;
+  min-height: 56px;
+  overflow: visible;
+  border-color: #b8de8c;
+  border-radius: 22px;
+  background: #e8f8d6;
+  font-size: 13px;
+}
+.log-controls .completed-control:hover { background: #dcf4c1; }
+.log-controls .active.success { background: var(--green); border-color: #8fc943; }
 .log-controls .active.missed { background: var(--red); border-color: #e9a79c; }
 .log-controls button span { font-size: 18px; vertical-align: -1px; }
+.completed-control .completion-check {
+  display: inline-grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  margin-right: 4px;
+  border-radius: 50%;
+  background: rgba(21, 21, 21, .09);
+}
+.completed-control.celebrate {
+  animation: completion-button-pop 520ms cubic-bezier(.2, 1.45, .4, 1);
+}
+.completed-control.celebrate::after {
+  content: "";
+  position: absolute;
+  inset: -5px;
+  border: 3px solid #79bd2c;
+  border-radius: 27px;
+  pointer-events: none;
+  animation: completion-ring 650ms ease-out forwards;
+}
+.completed-control.celebrate .completion-check {
+  animation: completion-check-pop 480ms cubic-bezier(.2, 1.6, .4, 1);
+}
+
+@keyframes completion-button-pop {
+  0% { transform: scale(.94); box-shadow: 0 0 0 0 rgba(126, 193, 49, .5); }
+  45% { transform: scale(1.08); box-shadow: 0 0 0 14px rgba(126, 193, 49, .18); }
+  100% { transform: scale(1); box-shadow: 0 0 0 24px rgba(126, 193, 49, 0); }
+}
+@keyframes completion-ring {
+  from { opacity: .9; transform: scale(.92); }
+  to { opacity: 0; transform: scale(1.22); }
+}
+@keyframes completion-check-pop {
+  0% { transform: rotate(-18deg) scale(.45); }
+  60% { transform: rotate(5deg) scale(1.35); }
+  100% { transform: rotate(0) scale(1); }
+}
+@keyframes completion-count-pop {
+  0% { color: #39720a; transform: scale(.82); }
+  55% { color: #39720a; transform: scale(1.16); }
+  100% { color: var(--ink); transform: scale(1); }
+}
 .rest-day { margin: 0; padding: 12px; background: #f4f2ed; border-radius: 10px; color: var(--muted); font-size: 12px; }
 .test-banner {
   width: 100%; margin-top: 20px; padding: 17px 18px;
@@ -306,7 +393,7 @@ a { color: inherit; }
 .app-footer p { margin: 0; font: 800 20px "Manrope"; letter-spacing: -.04em; }
 .app-footer span { color: var(--muted); font-size: 12px; }
 .method-button {
-  position: fixed; right: 26px; bottom: 24px;
+  position: fixed; right: 26px; bottom: calc(24px + env(safe-area-inset-bottom));
   width: 54px; height: 54px; display: grid; place-items: center;
   color: white; background: var(--ink); border-radius: 15px;
   box-shadow: 0 8px 30px rgba(0, 0, 0, .2);
@@ -496,7 +583,7 @@ a { color: inherit; }
   .dialog-actions button { width: 100%; }
   .weekday-picker { gap: 4px; }
   .weekday-picker button { min-height: 38px; }
-  .method-button { position: fixed; right: 15px; bottom: 15px; }
+  .method-button { position: fixed; right: 15px; bottom: calc(15px + env(safe-area-inset-bottom)); }
   .app-footer { padding-bottom: 88px; flex-direction: column; align-items: center; }
   .principle-grid { grid-template-columns: 1fr; }
   .smart-list li { grid-template-columns: 1fr; gap: 7px; }
@@ -507,4 +594,9 @@ a { color: inherit; }
   html { scroll-behavior: auto; }
   button { transition: none; }
   button:not(:disabled):active { transform: none; }
+  .completed-control.celebrate,
+  .completed-control.celebrate::after,
+  .completed-control.celebrate .completion-check,
+  .completed-count.celebrate { animation: none; }
+  .completed-control.celebrate::after { display: none; }
 }

@@ -74,6 +74,7 @@ Cada card deve mostrar, no mínimo:
 - Dias do projeto;
 - Dia-Alvo;
 - Consistência;
+- Execuções feitas;
 - Estado do registro atual;
 - Ação para registrar execução.
 
@@ -203,7 +204,9 @@ O registro do dia atual deve poder ser alterado entre:
 - Concluído;
 - Não concluído.
 
-A alteração deve atualizar imediatamente a consistência.
+A alteração deve atualizar imediatamente a consistência e a contagem de
+execuções feitas. Trocar um registro entre os estados não pode contar a mesma
+oportunidade mais de uma vez.
 
 ---
 
@@ -222,6 +225,10 @@ Exemplo:
 Dias futuros não devem entrar no cálculo.
 
 Dias fora da frequência do hábito não devem entrar no cálculo.
+
+A contagem de execuções feitas deve considerar somente registros `Concluído`
+em oportunidades programadas já ocorridas. Ela é derivada do histórico e não
+altera o formato persistido.
 
 Quando ainda não houver oportunidades:
 
@@ -361,6 +368,26 @@ Ao concluir:
 Uma meta cumprida deve poder ser reaberta. Ao reabrir, a data de cumprimento deve
 ser removida e a meta deve voltar ao grupo de metas ativas. Concluir ou reabrir
 não deve alterar o identificador, a data de criação ou a data-limite.
+
+---
+
+## RF19 — Instalar e usar offline no iPhone
+
+A aplicação deve funcionar como PWA em iPhone com iOS 17 ou posterior.
+
+- Após a primeira abertura online, todas as rotas e recursos essenciais devem
+  continuar disponíveis offline;
+- A instalação pela Tela de Início deve abrir em modo standalone;
+- O manifesto deve usar o nome `KPI Hábitos`, escopo e início em `/`, ícones de
+  192 px e 512 px e orientação livre;
+- Deve existir um `apple-touch-icon` de 180 px;
+- Fontes, estilos, scripts e ícones não devem depender da rede após o primeiro
+  carregamento;
+- As rotas `/metas` e `/metodologia` devem usar o documento principal como
+  fallback de navegação;
+- A atualização do service worker não deve limpar nem migrar o armazenamento
+  local;
+- A interface deve respeitar as áreas seguras superior e inferior do aparelho.
 
 ---
 
@@ -611,16 +638,21 @@ Em desktop amplo, os cards devem utilizar a variação **Atual condensada**:
 - Grade de três colunas, com duas colunas em larguras intermediárias;
 - Padding interno de 20 px;
 - Linha compacta com percentual de progresso;
-- Linha de métricas com Consistência, Dia-Alvo e Hoje;
-- Controles de registro com altura mínima de 44 px.
+- Contagem de execuções e consistência abaixo da barra;
+- Linha de métricas com Consistência, Dia-Alvo e Execuções;
+- “Não concluído” à esquerda e “Concluído” à direita;
+- “Concluído” aproximadamente 30% mais largo, com altura mínima de 56 px,
+  cantos arredondados e destaque verde.
 
 Em dispositivos móveis, os cards devem utilizar a variação **Compacta estrutural 01**:
 
 - Uma única coluna;
 - Remover a linha de três métricas;
-- Exibir `Dia X de Y` e `Z% consistência` na mesma linha;
+- Exibir `Dia X de Y` acima da barra;
+- Exibir `N execuções feitas` e `Z% consistência` em uma linha compacta abaixo
+  da barra;
 - O estado atual deve ser comunicado pelos controles selecionados;
-- Manter a barra de progresso e os controles com altura mínima de 44 px.
+- Manter a barra de progresso e a ação “Concluído” com altura mínima de 56 px.
 
 Quando existir, a versão mínima deve aparecer em uma linha curta no formato `Mínimo: descrição`.
 
@@ -711,14 +743,24 @@ Todos os botões habilitados devem apresentar uma resposta visual curta enquanto
 estiverem pressionados. O efeito deve respeitar a preferência de redução de
 movimento do sistema.
 
-Quando a API de vibração estiver disponível, ações importantes concluídas devem
-emitir um único pulso tátil discreto. São ações importantes: salvar hábitos ou
-metas, registrar a execução diária, excluir após confirmação, concluir ou reabrir
-uma meta, estender o acompanhamento e consolidar um hábito.
+Ao entrar no estado `Concluído`, o card deve tocar um acorde ascendente curto e
+aplicar uma celebração visual forte no botão e no check. O som deve ser iniciado
+diretamente pelo toque e não deve ocorrer ao desfazer ou ao marcar “Não
+concluído”. A contagem deve animar e a atualização deve ser anunciada por uma
+região `aria-live`.
+
+O feedback visual deve respeitar `prefers-reduced-motion`, mantendo a mudança
+estática quando movimentos intensos estiverem desativados. Falhas ou bloqueios
+da Web Audio API nunca devem impedir o registro.
+
+Quando a API de vibração estiver disponível, outras ações importantes concluídas
+podem emitir um único pulso tátil discreto. O Safari no iPhone não oferece suporte
+confiável a essa API, portanto a interface não deve prometer vibração como parte
+do feedback de conclusão.
 
 A ausência ou falha da API não deve impedir a ação principal. Abrir, fechar ou
 cancelar modais, navegar, selecionar campos e falhar em validações não devem
-emitir vibração. Esta versão não possui feedback sonoro.
+emitir vibração.
 
 ---
 

@@ -100,11 +100,22 @@ export function consistency(
 ): number | null {
   const opportunities = opportunityDates(habit, today);
   if (opportunities.length === 0) return null;
-  const validDates = new Set(opportunities);
-  const completed = habit.logs.filter(
-    (log) => log.status === "COMPLETED" && validDates.has(log.date)
-  ).length;
+  const completed = completedExecutions(habit, today);
   return Math.round((completed / opportunities.length) * 100);
+}
+
+export function completedExecutions(
+  habit: Habit,
+  today = toLocalDateKey()
+): number {
+  const completedDates = new Set(
+    habit.logs
+      .filter((log) => log.status === "COMPLETED")
+      .map((log) => log.date)
+  );
+
+  return opportunityDates(habit, today).filter((date) => completedDates.has(date))
+    .length;
 }
 
 export function setLog(

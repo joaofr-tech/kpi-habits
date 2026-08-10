@@ -3,6 +3,7 @@ import { FACTORS } from "../data/factors";
 import type { Habit, HabitFactors } from "../types";
 import {
   calculateTargetDays,
+  completedExecutions,
   consolidateHabit,
   consistency,
   extendHabit,
@@ -81,6 +82,22 @@ describe("regras de hábitos", () => {
     changed = setLog(changed, "2026-07-22", "COMPLETED");
     expect(changed.logs).toHaveLength(2);
     expect(consistency(changed, "2026-07-24")).toBe(67);
+  });
+
+  it("conta somente execuções programadas, únicas e não futuras", () => {
+    const withLogs: Habit = {
+      ...habit,
+      logs: [
+        { date: "2026-07-20", status: "COMPLETED" },
+        { date: "2026-07-20", status: "COMPLETED" },
+        { date: "2026-07-21", status: "COMPLETED" },
+        { date: "2026-07-22", status: "MISSED" },
+        { date: "2026-07-24", status: "COMPLETED" }
+      ]
+    };
+
+    expect(completedExecutions(withLogs, "2026-07-22")).toBe(1);
+    expect(completedExecutions(withLogs, "2026-07-24")).toBe(2);
   });
 
   it("mantém as transições de automaticidade no domínio", () => {

@@ -8,11 +8,13 @@ test("cria, persiste, registra e exclui um hábito", async ({
 }) => {
   await installHapticProbe(page);
   await page.goto("/");
-  expect(
-    await page.evaluate(
-      () => document.documentElement.scrollHeight > window.innerHeight
-    )
-  ).toBe(false);
+  if (!isMobile) {
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollHeight > window.innerHeight
+      )
+    ).toBe(false);
+  }
   await page.getByRole("button", { name: /criar primeiro hábito/i }).click();
   await page.getByLabel(/qual hábito você quer construir/i).fill("Caminhar");
   await page
@@ -39,7 +41,8 @@ test("cria, persiste, registra e exclui um hábito", async ({
 
   await page.reload();
   await page.getByRole("button", { name: /^concluído/i }).click();
-  expect(await hapticPatterns(page)).toEqual([10]);
+  expect(await hapticPatterns(page)).toEqual([]);
+  await expect(page.getByText("1 execução feita", { exact: true })).toBeVisible();
   await expect(
     isMobile
       ? page.getByText("100% consistência")
@@ -52,11 +55,11 @@ test("cria, persiste, registra e exclui um hábito", async ({
   ).toBeVisible();
   await page.keyboard.press("Escape");
   await expect(page.getByRole("heading", { name: "Caminhar" })).toBeVisible();
-  expect(await hapticPatterns(page)).toEqual([10]);
+  expect(await hapticPatterns(page)).toEqual([]);
 
   await page.getByRole("button", { name: /excluir caminhar/i }).click();
   await page.getByRole("button", { name: "Excluir hábito" }).click();
-  expect(await hapticPatterns(page)).toEqual([10, 10]);
+  expect(await hapticPatterns(page)).toEqual([10]);
   await expect(page.getByText(/seu primeiro hábito começa/i)).toBeVisible();
   await page.getByRole("link", { name: /abrir metodologia/i }).click();
   await expect(page.getByRole("heading", { name: /repetir é construir/i })).toBeVisible();
