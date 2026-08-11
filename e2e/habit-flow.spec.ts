@@ -30,10 +30,34 @@ test("cria, persiste, registra e exclui um hábito", async ({
 
   await expect(page.getByRole("heading", { name: "Caminhar" })).toBeVisible();
   await expect(page.getByText("por 20 minutos depois do almoço")).toBeVisible();
+  await expect(
+    page.getByRole("group", {
+      name: "Sequência atual: 0 oportunidades concluídas"
+    })
+  ).toBeVisible();
 
   if (isMobile) {
     await expect(page.locator(".mobile-card-summary")).toBeVisible();
     await expect(page.locator(".metric-row")).toBeHidden();
+
+    const cardBox = await page.locator(".habit-card").boundingBox();
+    const missedBox = await page
+      .getByRole("button", { name: "Não concluído", exact: true })
+      .boundingBox();
+    const completedBox = await page
+      .getByRole("button", { name: "Concluído", exact: true })
+      .boundingBox();
+    expect(cardBox).not.toBeNull();
+    expect(missedBox).not.toBeNull();
+    expect(completedBox).not.toBeNull();
+    expect(completedBox!.width).toBeGreaterThan(missedBox!.width * 1.2);
+    expect(completedBox!.height).toBeGreaterThanOrEqual(60);
+    expect(cardBox!.x + cardBox!.width).toBeLessThanOrEqual(page.viewportSize()!.width);
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth > window.innerWidth
+      )
+    ).toBe(false);
   } else {
     await expect(page.locator(".mobile-card-summary")).toBeHidden();
     await expect(page.locator(".metric-row")).toBeVisible();
@@ -43,6 +67,11 @@ test("cria, persiste, registra e exclui um hábito", async ({
   await page.getByRole("button", { name: /^concluído/i }).click();
   expect(await hapticPatterns(page)).toEqual([]);
   await expect(page.getByText("1 execução feita", { exact: true })).toBeVisible();
+  await expect(
+    page.getByRole("group", {
+      name: "Sequência atual: 1 oportunidade concluída"
+    })
+  ).toBeVisible();
   await expect(
     isMobile
       ? page.getByText("100% consistência")

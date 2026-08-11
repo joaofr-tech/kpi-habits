@@ -4,6 +4,7 @@ import type { Habit, HabitFactors } from "../types";
 import {
   calculateTargetDays,
   completedExecutions,
+  consecutiveExecutions,
   consolidateHabit,
   consistency,
   extendHabit,
@@ -98,6 +99,43 @@ describe("regras de hábitos", () => {
 
     expect(completedExecutions(withLogs, "2026-07-22")).toBe(1);
     expect(completedExecutions(withLogs, "2026-07-24")).toBe(2);
+  });
+
+  it("calcula a sequência por oportunidades e preserva o dia atual pendente", () => {
+    const completed = {
+      ...habit,
+      logs: [
+        { date: "2026-07-20", status: "COMPLETED" as const },
+        { date: "2026-07-22", status: "COMPLETED" as const },
+        { date: "2026-07-24", status: "COMPLETED" as const }
+      ]
+    };
+
+    expect(consecutiveExecutions(completed, "2026-07-24")).toBe(3);
+    expect(consecutiveExecutions(completed, "2026-07-25")).toBe(3);
+    expect(consecutiveExecutions(completed, "2026-07-27")).toBe(3);
+    expect(
+      consecutiveExecutions(setLog(completed, "2026-07-27", "COMPLETED"), "2026-07-27")
+    ).toBe(4);
+    expect(
+      consecutiveExecutions(setLog(completed, "2026-07-27", "MISSED"), "2026-07-27")
+    ).toBe(0);
+  });
+
+  it("interrompe a sequência em oportunidade passada ausente ou não concluída", () => {
+    const missingMiddle = {
+      ...habit,
+      logs: [
+        { date: "2026-07-20", status: "COMPLETED" as const },
+        { date: "2026-07-24", status: "COMPLETED" as const },
+        { date: "2026-07-27", status: "COMPLETED" as const }
+      ]
+    };
+    const missedMiddle = setLog(missingMiddle, "2026-07-24", "MISSED");
+
+    expect(consecutiveExecutions(missingMiddle, "2026-07-27")).toBe(2);
+    expect(consecutiveExecutions(missedMiddle, "2026-07-27")).toBe(1);
+    expect(consecutiveExecutions(habit, "2026-07-19")).toBe(0);
   });
 
   it("mantém as transições de automaticidade no domínio", () => {

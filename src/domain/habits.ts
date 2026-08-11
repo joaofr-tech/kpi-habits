@@ -118,6 +118,28 @@ export function completedExecutions(
     .length;
 }
 
+export function consecutiveExecutions(
+  habit: Habit,
+  today = toLocalDateKey()
+): number {
+  const opportunities = opportunityDates(habit, today);
+
+  if (
+    opportunities.at(-1) === today &&
+    currentLog(habit, today) === null
+  ) {
+    opportunities.pop();
+  }
+
+  let sequence = 0;
+  for (let index = opportunities.length - 1; index >= 0; index -= 1) {
+    if (currentLog(habit, opportunities[index]) !== "COMPLETED") break;
+    sequence += 1;
+  }
+
+  return sequence;
+}
+
 export function setLog(
   habit: Habit,
   date: string,

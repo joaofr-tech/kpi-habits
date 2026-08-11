@@ -208,6 +208,19 @@ A alteração deve atualizar imediatamente a consistência e a contagem de
 execuções feitas. Trocar um registro entre os estados não pode contar a mesma
 oportunidade mais de uma vez.
 
+O card deve mostrar também uma sequência atual de oportunidades concluídas. A
+sequência é uma métrica secundária e não substitui Dias do projeto nem
+Consistência.
+
+- Dias fora da agenda não entram na sequência e não a interrompem;
+- Uma oportunidade passada não registrada ou `Não concluído` interrompe a
+  sequência;
+- A oportunidade atual pendente preserva a sequência anterior até receber um
+  registro;
+- `Concluído` aumenta a sequência e `Não concluído` a zera;
+- A sequência deve ser derivada dos registros existentes, sem novo estado
+  persistido.
+
 ---
 
 ## RF09 — Calcular consistência
@@ -627,6 +640,10 @@ Default sugerido de hierarquia:
 3. Consistência;
 4. Controle de execução.
 
+A sequência pode receber destaque visual por meio de um bloco com fogo, mas
+deve permanecer secundária em relação aos Dias do projeto e à Consistência. Ela
+não cria pontos, prêmios, ranking ou sistema de recompensas.
+
 ---
 
 ## 8.4 Card de hábito
@@ -643,6 +660,9 @@ Em desktop amplo, os cards devem utilizar a variação **Atual condensada**:
 - “Não concluído” à esquerda e “Concluído” à direita;
 - “Concluído” aproximadamente 30% mais largo, com altura mínima de 56 px,
   cantos arredondados e destaque verde.
+- Aparência tátil com borda marcada, sombra inferior e resposta de pressão nos
+  controles;
+- Bloco de sequência no topo à direita, com fogo, número e rótulo `seguidas`.
 
 Em dispositivos móveis, os cards devem utilizar a variação **Compacta estrutural 01**:
 
@@ -653,6 +673,10 @@ Em dispositivos móveis, os cards devem utilizar a variação **Compacta estrutu
   da barra;
 - O estado atual deve ser comunicado pelos controles selecionados;
 - Manter a barra de progresso e a ação “Concluído” com altura mínima de 56 px.
+- Usar padding de aproximadamente 18 px, cantos amplos e controles na região
+  inferior do card;
+- Manter o bloco de sequência sempre visível: apagado e cinza em zero, laranja
+  e elevado quando ativo.
 
 Quando existir, a versão mínima deve aparecer em uma linha curta no formato `Mínimo: descrição`.
 
@@ -662,6 +686,7 @@ Cada card deve conter:
 - Dias do projeto;
 - Dia-Alvo;
 - Consistência;
+- Sequência atual de oportunidades concluídas;
 - Botão “Concluído”;
 - Botão ou opção “Não concluído”;
 - Menu ou ação de exclusão.
@@ -748,6 +773,9 @@ aplicar uma celebração visual forte no botão e no check. O som deve ser inici
 diretamente pelo toque e não deve ocorrer ao desfazer ou ao marcar “Não
 concluído”. A contagem deve animar e a atualização deve ser anunciada por uma
 região `aria-live`.
+
+Quando a conclusão aumentar a sequência, o bloco do fogo e seu número devem
+pulsar uma vez. Não deve existir animação ambiente contínua.
 
 O feedback visual deve respeitar `prefers-reduced-motion`, mantendo a mudança
 estática quando movimentos intensos estiverem desativados. Falhas ou bloqueios

@@ -1,10 +1,12 @@
 import { useState } from "react";
 import {
   completedExecutions,
+  consecutiveExecutions,
   consistency,
   currentLog,
   isScheduledDate,
-  projectDays
+  projectDays,
+  setLog
 } from "../domain/habits";
 import { toLocalDateKey } from "../domain/date";
 import type { Habit, HabitLogStatus } from "../types";
@@ -28,6 +30,7 @@ export function HabitCard({
   const days = projectDays(habit.createdAt, today);
   const rate = consistency(habit, today);
   const completed = completedExecutions(habit, today);
+  const sequence = consecutiveExecutions(habit, today);
   const log = currentLog(habit, today);
   const scheduled = isScheduledDate(habit, today);
   const progress = Math.min(100, Math.round((days / habit.targetDays) * 100));
@@ -36,13 +39,22 @@ export function HabitCard({
 
   function logToday(status: HabitLogStatus | null) {
     if (status === "COMPLETED" && log !== "COMPLETED") {
+      const nextSequence = consecutiveExecutions(
+        setLog(habit, today, "COMPLETED"),
+        today
+      );
       playCompletionSound();
       setCelebrating(true);
       setAnnouncement(
-        `${habit.name}: ${completed + 1} ${completed === 0 ? "execução feita" : "execuções feitas"}`
+        `${habit.name}: ${completed + 1} ${completed === 0 ? "execução feita" : "execuções feitas"}. Sequência atual: ${nextSequence} ${nextSequence === 1 ? "oportunidade" : "oportunidades"}.`
       );
     } else if (log === "COMPLETED") {
-      setAnnouncement(`${habit.name}: ${Math.max(0, completed - 1)} execuções feitas`);
+      const nextSequence = consecutiveExecutions(setLog(habit, today, status), today);
+      setAnnouncement(
+        `${habit.name}: ${Math.max(0, completed - 1)} execuções feitas. Sequência atual: ${nextSequence} ${nextSequence === 1 ? "oportunidade" : "oportunidades"}.`
+      );
+    } else if (status === "MISSED") {
+      setAnnouncement(`${habit.name}: sequência atual zerada.`);
     }
     onLog(status);
   }
@@ -50,17 +62,30 @@ export function HabitCard({
   return (
     <article className="habit-card">
       <div className="card-head">
-        <div>
+        <div className="card-head-copy">
           <h2>{habit.name}</h2>
           {habit.details && <p className="habit-details">{habit.details}</p>}
         </div>
-        <button
-          className="icon-button subtle"
-          onClick={onDelete}
-          aria-label={`Excluir ${habit.name}`}
-        >
-          <TrashIcon />
-        </button>
+        <div className="card-head-tools">
+          <button
+            className="icon-button subtle"
+            onClick={onDelete}
+            aria-label={`Excluir ${habit.name}`}
+          >
+            <TrashIcon />
+          </button>
+          <div
+            className={`streak-tile${sequence > 0 ? " active" : ""}${celebrating ? " celebrate" : ""}`}
+            role="group"
+            aria-label={`Sequência atual: ${sequence} ${sequence === 1 ? "oportunidade concluída" : "oportunidades concluídas"}`}
+          >
+            <div className="streak-value">
+              <span className="streak-flame" aria-hidden="true">🔥</span>
+              <strong>{sequence}</strong>
+            </div>
+            <span className="streak-label">seguidas</span>
+          </div>
+        </div>
       </div>
 
       {habit.minimumVersion && (

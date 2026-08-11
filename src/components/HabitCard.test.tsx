@@ -71,6 +71,14 @@ describe("card de hábito", () => {
     expect(stats).toHaveTextContent("0% consistência");
     expect(screen.getByText("Execuções").nextElementSibling).toHaveTextContent("0");
 
+    const sequence = screen.getByRole("group", {
+      name: "Sequência atual: 0 oportunidades concluídas"
+    });
+    expect(sequence).not.toHaveClass("active");
+    expect(
+      screen.getByRole("heading", { name: "Caminhar" }).compareDocumentPosition(sequence)
+    ).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
+
     const missed = screen.getByRole("button", { name: "Não concluído" });
     const completed = screen.getByRole("button", { name: "Concluído" });
     expect(missed.compareDocumentPosition(completed)).toBe(
@@ -86,17 +94,35 @@ describe("card de hábito", () => {
     const completed = screen.getByRole("button", { name: "Concluído" });
     await user.click(completed);
     expect(screen.getByText("1 execução feita")).toBeInTheDocument();
-    expect(screen.getByText("Caminhar: 1 execução feita")).toHaveAttribute(
+    expect(
+      screen.getByText(
+        "Caminhar: 1 execução feita. Sequência atual: 1 oportunidade."
+      )
+    ).toHaveAttribute(
       "aria-live",
       "polite"
     );
+    expect(
+      screen.getByRole("group", {
+        name: "Sequência atual: 1 oportunidade concluída"
+      })
+    ).toHaveClass("active", "celebrate");
     expect(playCompletionSound).toHaveBeenCalledTimes(1);
 
     await user.click(screen.getByRole("button", { name: "Concluído" }));
     expect(screen.getByText("0 execuções feitas")).toBeInTheDocument();
+    expect(
+      screen.getByRole("group", {
+        name: "Sequência atual: 0 oportunidades concluídas"
+      })
+    ).not.toHaveClass("active");
     expect(playCompletionSound).toHaveBeenCalledTimes(1);
 
     await user.click(screen.getByRole("button", { name: "Não concluído" }));
+    expect(screen.getByText("Caminhar: sequência atual zerada.")).toHaveAttribute(
+      "aria-live",
+      "polite"
+    );
     expect(playCompletionSound).toHaveBeenCalledTimes(1);
     await user.click(screen.getByRole("button", { name: "Concluído" }));
     expect(playCompletionSound).toHaveBeenCalledTimes(2);
