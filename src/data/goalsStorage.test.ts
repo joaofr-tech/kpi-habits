@@ -18,12 +18,24 @@ describe("persistência de metas", () => {
     saveGoals([goal]);
 
     expect(loadGoals()).toEqual([goal]);
-    expect(JSON.parse(localStorage.getItem("kpi-goals")!).version).toBe(1);
+    expect(JSON.parse(localStorage.getItem("habitus-goals")!).version).toBe(1);
+  });
+
+  it("migra automaticamente da chave legada kpi-goals para habitus-goals", () => {
+    localStorage.setItem(
+      "kpi-goals",
+      JSON.stringify({ version: 1, goals: [goal] })
+    );
+
+    expect(loadGoals()).toEqual([goal]);
+    expect(localStorage.getItem("habitus-goals")).toBe(
+      JSON.stringify({ version: 1, goals: [goal] })
+    );
   });
 
   it("descarta metas inválidas sem perder as válidas", () => {
     localStorage.setItem(
-      "kpi-goals",
+      "habitus-goals",
       JSON.stringify({ version: 1, goals: [{ ...goal, name: " " }, goal] })
     );
 
@@ -36,7 +48,7 @@ describe("persistência de metas", () => {
     expect(loadGoals()).toEqual([completedGoal]);
 
     localStorage.setItem(
-      "kpi-goals",
+      "habitus-goals",
       JSON.stringify({
         version: 1,
         goals: [{ ...goal, completedAt: "data-inválida" }]
@@ -46,11 +58,11 @@ describe("persistência de metas", () => {
   });
 
   it("ignora JSON corrompido e versões desconhecidas", () => {
-    localStorage.setItem("kpi-goals", "{");
+    localStorage.setItem("habitus-goals", "{");
     expect(loadGoals()).toEqual([]);
 
     localStorage.setItem(
-      "kpi-goals",
+      "habitus-goals",
       JSON.stringify({ version: 2, goals: [goal] })
     );
     expect(loadGoals()).toEqual([]);

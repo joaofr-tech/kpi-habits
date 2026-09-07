@@ -1,7 +1,8 @@
 import type { Goal } from '../types';
 import { isLocalDateKey } from '../domain/date';
 
-const STORAGE_KEY = 'kpi-goals';
+const STORAGE_KEY = 'habitus-goals';
+const LEGACY_STORAGE_KEY = 'kpi-goals';
 
 function normalizeText(value: unknown, maxLength: number): string | null {
   if (typeof value !== 'string') return null;
@@ -46,7 +47,14 @@ function normalizeGoal(value: unknown): Goal | null {
 
 export function loadGoals(): Goal[] {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    let raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) {
+      const legacyRaw = localStorage.getItem(LEGACY_STORAGE_KEY);
+      if (legacyRaw) {
+        raw = legacyRaw;
+        localStorage.setItem(STORAGE_KEY, legacyRaw);
+      }
+    }
     if (!raw) return [];
     const parsed: unknown = JSON.parse(raw);
     if (

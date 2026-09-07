@@ -11,7 +11,7 @@ interface AppHeaderProps {
 export function AppHeader({ onAdd, addLabel, activeSection }: AppHeaderProps) {
   return (
     <header className="app-header">
-      <AppLink href="/" className="brand" aria-label="KPI — início">
+      <AppLink href="/" className="brand" aria-label="Habitus — início">
         <BrandMark className="brand-mark" />
       </AppLink>
       {activeSection && (

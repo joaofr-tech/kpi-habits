@@ -2,13 +2,13 @@
 ## `SPEC.md`
 
 ```md
-# 001 — KPI de Hábitos
+# 001 — Habitus
 
 ## 1. Visão geral
 
 ### Objetivo
 
-Criar uma aplicação web minimalista para calcular e acompanhar um KPI pessoal de formação de hábitos e registrar metas pessoais simples.
+Criar uma aplicação web minimalista para calcular e acompanhar a consolidação de hábitos e registrar metas pessoais simples.
 
 Cada hábito terá:
 
@@ -391,7 +391,7 @@ A aplicação deve funcionar como PWA em iPhone com iOS 17 ou posterior.
 - Após a primeira abertura online, todas as rotas e recursos essenciais devem
   continuar disponíveis offline;
 - A instalação pela Tela de Início deve abrir em modo standalone;
-- O manifesto deve usar o nome `KPI Hábitos`, escopo e início em `/`, ícones de
+- O manifesto deve usar o nome `Habitus`, escopo e início em `/`, ícones de
   192 px e 512 px e orientação livre;
 - Deve existir um `apple-touch-icon` de 180 px;
 - Fontes, estilos, scripts e ícones não devem depender da rede após o primeiro
@@ -578,18 +578,18 @@ A interface deve ser:
 
 ### Lado esquerdo
 
-Exibir a sigla:
+Exibir a marca:
 
-> KPI
+> Habitus
 
-A sigla deve ser apresentada como um wordmark `KPI`:
+A sigla deve ser apresentada como um wordmark `HABITUS`:
 
 - Em letras maiúsculas, brancas e de peso forte;
 - Dentro de um bloco preto compacto, com cantos discretamente arredondados;
 - Com desenho geométrico, terminais retos e diagonais afiadas;
 - Sem conexões, ornamentos ou detalhes que prejudiquem a leitura imediata;
 - Vetorial e responsiva, permanecendo legível em telas pequenas;
-- A redução para favicon deve reutilizar o bloco preto e o mesmo gesto anguloso.
+- A redução para favicon deve apresentar o monograma H geométrico em bloco preto com cantos arredondados.
 
 ### Lado direito
 

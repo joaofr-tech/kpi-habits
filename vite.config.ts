@@ -14,8 +14,8 @@ export default defineConfig({
         "pwa-512x512.png"
       ],
       manifest: {
-        name: "KPI Hábitos",
-        short_name: "KPI Hábitos",
+        name: "Habitus",
+        short_name: "Habitus",
         description: "Acompanhe hábitos e metas pessoais de forma simples.",
         start_url: "/",
         scope: "/",

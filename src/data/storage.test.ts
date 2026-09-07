@@ -26,7 +26,19 @@ describe("persistência", () => {
   it("salva e carrega o envelope versionado", () => {
     saveHabits([habit]);
     expect(loadHabits()).toEqual([habit]);
-    expect(JSON.parse(localStorage.getItem("kpi-habits")!).version).toBe(2);
+    expect(JSON.parse(localStorage.getItem("habitus-habits")!).version).toBe(2);
+  });
+
+  it("migra automaticamente da chave legada kpi-habits para habitus-habits", () => {
+    localStorage.setItem(
+      "kpi-habits",
+      JSON.stringify({ version: 2, habits: [habit] })
+    );
+
+    expect(loadHabits()).toEqual([habit]);
+    expect(localStorage.getItem("habitus-habits")).toBe(
+      JSON.stringify({ version: 2, habits: [habit] })
+    );
   });
 
   it("migra hábitos da versão 1 sem alterar o Dia-Alvo ou os registros", () => {
@@ -59,10 +71,10 @@ describe("persistência", () => {
   });
 
   it("isola envelopes, hábitos e registros inválidos", () => {
-    localStorage.setItem("kpi-habits", "{");
+    localStorage.setItem("habitus-habits", "{");
     expect(loadHabits()).toEqual([]);
 
-    localStorage.setItem("kpi-habits", JSON.stringify({ version: 3, habits: [habit] }));
+    localStorage.setItem("habitus-habits", JSON.stringify({ version: 3, habits: [habit] }));
     expect(loadHabits()).toEqual([]);
 
     const habitWithInvalidLogs = {
@@ -74,7 +86,7 @@ describe("persistência", () => {
       ]
     };
     localStorage.setItem(
-      "kpi-habits",
+      "habitus-habits",
       JSON.stringify({
         version: 2,
         habits: [

@@ -1,7 +1,7 @@
-# KPI Hábitos
+# Habitus
 
-Aplicação web minimalista para calcular e acompanhar um KPI pessoal de
-formação de hábitos.
+Aplicação web minimalista para calcular e acompanhar a consolidação de
+hábitos e metas pessoais simples.
 
 Cada hábito possui uma frequência semanal, um período estimado de
 acompanhamento, registros por oportunidade e uma métrica de consistência. Todo

@@ -8,7 +8,8 @@ import type {
   Weekday
 } from "../types";
 
-const STORAGE_KEY = "kpi-habits";
+const STORAGE_KEY = "habitus-habits";
+const LEGACY_STORAGE_KEY = "kpi-habits";
 
 const WEEKDAYS = new Set<Weekday>([
   "MONDAY",
@@ -159,7 +160,14 @@ function normalizeHabit(value: unknown): Habit | null {
 
 export function loadHabits(): Habit[] {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    let raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) {
+      const legacyRaw = localStorage.getItem(LEGACY_STORAGE_KEY);
+      if (legacyRaw) {
+        raw = legacyRaw;
+        localStorage.setItem(STORAGE_KEY, legacyRaw);
+      }
+    }
     if (!raw) return [];
     const parsed: unknown = JSON.parse(raw);
     if (

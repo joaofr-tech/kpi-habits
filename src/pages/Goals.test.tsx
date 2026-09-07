@@ -54,7 +54,7 @@ describe("metas", () => {
     expect(screen.getByText(/informe uma especificação/i)).toBeInTheDocument();
     expect(screen.getByText(/escolha hoje ou uma data futura/i)).toBeInTheDocument();
     expect(screen.getByText(/informe uma motivação/i)).toBeInTheDocument();
-    expect(localStorage.getItem("kpi-goals")).not.toContain("2000-01-01");
+    expect(localStorage.getItem("habitus-goals")).not.toContain("2000-01-01");
     expect(triggerHapticFeedback).not.toHaveBeenCalled();
 
   });
@@ -69,7 +69,7 @@ describe("metas", () => {
       createdAt: "2026-07-29"
     };
     localStorage.setItem(
-      "kpi-goals",
+      "habitus-goals",
       JSON.stringify({ version: 1, goals: [originalGoal] })
     );
     const user = userEvent.setup();
@@ -101,7 +101,7 @@ describe("metas", () => {
     expect(
       screen.getByRole("heading", { name: "Criar reserva de emergência" })
     ).toBeInTheDocument();
-    expect(JSON.parse(localStorage.getItem("kpi-goals")!).goals[0]).toEqual({
+    expect(JSON.parse(localStorage.getItem("habitus-goals")!).goals[0]).toEqual({
       ...originalGoal,
       name: "Criar reserva de emergência",
       motivation: "Ter tranquilidade diante de imprevistos"
@@ -129,7 +129,7 @@ describe("metas", () => {
     expect(
       screen.getByRole("heading", { name: /uma meta clara transforma/i })
     ).toBeInTheDocument();
-    expect(JSON.parse(localStorage.getItem("kpi-goals")!).goals).toEqual([]);
+    expect(JSON.parse(localStorage.getItem("habitus-goals")!).goals).toEqual([]);
     expect(triggerHapticFeedback).toHaveBeenCalledTimes(2);
   });
 
@@ -148,7 +148,7 @@ describe("metas", () => {
       name: "Fazer uma viagem"
     };
     localStorage.setItem(
-      "kpi-goals",
+      "habitus-goals",
       JSON.stringify({ version: 1, goals: [firstGoal, secondGoal] })
     );
     const user = userEvent.setup();
@@ -169,7 +169,7 @@ describe("metas", () => {
         (heading) => heading.textContent
       )
     ).toEqual(["Fazer uma viagem", "Criar uma reserva"]);
-    expect(JSON.parse(localStorage.getItem("kpi-goals")!).goals[0]).toEqual({
+    expect(JSON.parse(localStorage.getItem("habitus-goals")!).goals[0]).toEqual({
       ...firstGoal,
       completedAt: toLocalDateKey()
     });
@@ -202,7 +202,7 @@ describe("metas", () => {
       )
     ).toEqual(["Criar uma reserva", "Fazer uma viagem"]);
     expect(
-      JSON.parse(localStorage.getItem("kpi-goals")!).goals[0].completedAt
+      JSON.parse(localStorage.getItem("habitus-goals")!).goals[0].completedAt
     ).toBeUndefined();
     expect(triggerHapticFeedback).toHaveBeenCalledTimes(3);
   });
