@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { AppFooter } from "../components/AppFooter";
 import { AppHeader } from "../components/AppHeader";
 import { DeleteConfirmationDialog } from "../components/DeleteConfirmationDialog";
 import { GoalDialog } from "../components/GoalDialog";
@@ -93,10 +94,7 @@ export function Goals() {
           </>
         )}
       </main>
-      <footer className="app-footer">
-        <p>Believe it first.</p>
-        <span></span>
-      </footer>
+      <AppFooter />
       <AppLink
         className="method-button"
         href="/metodologia"

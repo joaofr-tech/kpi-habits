@@ -1,3 +1,4 @@
+import { AppFooter } from "../components/AppFooter";
 import { AppHeader } from "../components/AppHeader";
 import { ArrowLeftIcon } from "../components/Icons";
 import { AppLink } from "../navigation";
@@ -156,10 +157,7 @@ export function Methodology() {
           <strong>Voltar aos meus hábitos →</strong>
         </AppLink>
       </main>
-      <footer className="app-footer">
-        <p>Eu sou o melhor</p>
-        <span>um dia de cada vez</span>
-      </footer>
+      <AppFooter />
     </div>
   );
 }

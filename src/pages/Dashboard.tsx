@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { AppFooter } from "../components/AppFooter";
 import { AppHeader } from "../components/AppHeader";
 import { AutomaticityDialog } from "../components/AutomaticityDialog";
 import { CreateHabitDialog } from "../components/CreateHabitDialog";
@@ -69,10 +70,7 @@ export function Dashboard() {
           </>
         )}
       </main>
-      <footer className="app-footer">
-        <p>Eu não quero, mas tenho que fazer.</p>
-        <span>Então, que importa o que eu quero?</span>
-      </footer>
+      <AppFooter />
       <AppLink
         className="method-button"
         href="/metodologia"
